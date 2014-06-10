@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <style>
+        #field {
+            position: absolute;
+            left: 100px;
+            top: 50px;
+            width: 400px;
+            height: 500px;
+            background-color: #000000;
+        }
+        .player {
+            position: absolute;
+            height: 10px;
+            width: 100px;
+            background-color: #ffffff;
+        }
+        #player2 {
+            top: 5px;
+            left: 150px;
+        }
+        #player1 {
+            bottom: 5px;
+            left: 150px;
+        }
+        #ball {
+            position: absolute;
+            height: 20px;
+            width: 20px;
+            top: 5px;
+            left: 5px;
+            background-color: #ffffff;
+        }
+        #scoreBoard {
+            position: absolute;
+            left: 550px;
+            top: 50px;
+        }
+    </style>
+    <title></title>
+</head>
+<body>
+
+<div id="field">
+    <div id="player2" class="player"></div>
+    <div id="player1" class="player"></div>
+    <div id="ball"></div>
+</div>
+<div id="scoreBoard">
+    1 - 1
+</div>
+
+<script src="jQuery/jquery-1.9.1.js"></script>
+
+<script>
+    (function() {
+
+        var interval = 25;
+
+        var xStart = 100;
+        var xEnd = 500;
+        var fieldHeight = 500;
+        var fieldWidth = xEnd - xStart;
+        var playerWidth = 100;
+        var playerHeight = 20;
+        var playerPadding = 5;
+
+        var score1 = 0;
+        var score2 = 0;
+
+        var ball = {
+            x: 10
+            , y: 10
+            , size: 20
+            , speed: 4
+            , angle: 85
+            , velocityX: Math.cos(10 * Math.PI / 180) * 4
+            , velocityY: Math.sin(10 * Math.PI / 180) * 4
+        }
+
+        var $field = $('#field');
+        var $ball = $('#ball');
+        var $player1 = $('#player1');
+        var $player2 = $('#player2');
+        var $scoreBoard = $('#scoreBoard');
+
+        $field.mousemove(function(event) {
+            $player1.css('left', (event.pageX - 100 - playerWidth / 2));
+            $player2.css('left', (event.pageX - 100 - playerWidth / 2));
+        });
+
+        function drawScreen() {
+            $ball.css('left', ball.x);
+            $ball.css('top', ball.y);
+            ball.x = ball.x + ball.velocityX;
+            ball.y = ball.y + ball.velocityY;
+
+            if (ball.y <= playerHeight + playerPadding && ball.y >= playerHeight + playerPadding - ball.speed) {
+                var playerLeft = parseInt($player2.css('left'));
+                if (ball.x < playerLeft + playerWidth && ball.x + ball.size > playerLeft) {
+                    ball.angle = 360 - ball.angle;
+                }
+            }
+
+            if (ball.y >= fieldHeight - playerHeight - playerPadding - ball.size
+                    && ball.y <= fieldHeight - playerHeight - playerPadding  - ball.size + ball.speed) {
+                var playerLeft = parseInt($player1.css('left'));
+                if (ball.x < playerLeft + playerWidth && ball.x + ball.size > playerLeft) {
+                    ball.angle = 360 - ball.angle;
+                }
+            }
+
+            if (ball.y <= 0) {
+                score1++;
+                goal();
+            }
+
+            if ( ball.y >= fieldHeight - ball.size) {
+                score2++;
+                goal();
+            }
+
+
+
+            if (ball.x <= 0 || ball.x >= fieldWidth - ball.size) {
+                if (ball.angle >= 0 && ball.angle < 180) {
+                    ball.angle = 180 - ball.angle;
+                }
+                if (ball.angle >= 180 && ball.angle < 360) {
+                    ball.angle = 270 * 2 - ball.angle;
+                }
+            }
+            ball.velocityX = Math.cos(ball.angle * Math.PI / 180) * ball.speed;
+            ball.velocityY = Math.sin(ball.angle  * Math.PI / 180) * ball.speed;
+        }
+
+        function goal() {
+            $scoreBoard.text(score1 + ' - ' + score2);
+            ball = {
+                x: 30
+                , y: 30
+                , size: 20
+                , speed: 4
+                , angle: 85
+                , velocityX: Math.cos(10 * Math.PI / 180) * 4
+                , velocityY: Math.sin(10 * Math.PI / 180) * 4
+            }
+        }
+
+        setInterval(drawScreen, 25)
+    })();
+</script>
+
+</body>
+</html>
