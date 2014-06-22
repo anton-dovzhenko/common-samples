@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>WebStart</artifactId>
+        <groupId>WebStart</groupId>
+        <version>1.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <packaging>jar</packaging>
+    <artifactId>application</artifactId>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jarsigner-plugin</artifactId>
+                <version>1.2</version>
+                <executions>
+                    <execution>
+                        <id>sign</id>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                        <phase>
+                            package
+                        </phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <verbose>true</verbose>
+                    <keystore>keystore</keystore>
+                    <alias>anton</alias>
+                    <storepass>123456</storepass>
+                    <keypass>123456</keypass>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>com.application.main.Main</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+
+</project>

@@ -1,0 +1,17 @@
+<jnlp spec="1.0+" codebase="http://localhost:8080/webstart/jnlp" href="application.jnlp">
+    <information>
+        <title>WebStart Demo</title>
+        <vendor>Anton Dovzhenko</vendor>
+        <homepage href="http://localhost:8080/webstart/index.jsp" />
+        <description>WebStart Demo</description>
+        <offline-allowed />
+    </information>
+    <resources>
+        <j2se version="1.5+" />
+        <jar href="application-1.0.jar" />
+    </resources>
+    <security>
+        <all-permissions />
+    </security>
+    <application-desc main-class="com.application.main.Main" />
+</jnlp>
