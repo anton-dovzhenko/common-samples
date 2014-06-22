@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ch2BaseFile - Template For Chapter 2 Examples</title>
+<script src="modernizr.js"></script>
+<script src="Debugger.js"></script>
+</head>
+<body>
+	<div style="position: absolute; left: 50px; top: 50px;">
+		<canvas id="canvas" width="500" height ="500">
+			Your browser does not support canvas!
+		</canvas>
+		<form>
+			<input type="button" id="createImageDate" value="Export Canvas Image"/>
+		</form>
+	</div>
+<script>
+	
+	function eventWindowLoaded() {
+		canvasApp();
+	}
+	
+	window.addEventListener("load", eventWindowLoaded, false);
+	
+	function canvasSupport() {
+		return Modernizr.canvas;
+	}
+	
+	function canvasApp() {
+		if (!canvasSupport()) {
+			return;
+		} else {
+			var canvas = document.getElementById("canvas");
+			ctx = canvas.getContext("2d");
+		}
+		drawScreen();
+	}
+	
+	function drawScreen() {
+		ctx.fillStyle = "#000000";
+		ctx.strokeStyle = "#ff00ff";
+        ctx.lineWidth = 2;
+        ctx.fillRect(10, 10, 40, 40);
+        ctx.strokeRect(0, 0, 60, 60);
+        ctx.clearRect(20, 20, 20, 20);
+
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 10;
+
+        ctx.lineCap = "square";
+        ctx.lineJoin = "bevel";
+        ctx.beginPath();
+        ctx.moveTo(100, 10);
+        ctx.lineTo(125, 10);
+        ctx.lineTo(125, 25);
+        ctx.stroke();
+        ctx.closePath();
+
+        ctx.lineCap = "butt";
+        ctx.lineJoin = "miter";
+        ctx.beginPath();
+        ctx.moveTo(110, 50);
+        ctx.lineTo(135, 50);
+        ctx.lineTo(135, 75);
+        ctx.stroke();
+        ctx.closePath();
+
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.beginPath();
+        ctx.moveTo(110, 100);
+        ctx.lineTo(135, 100);
+        ctx.lineTo(135, 125);
+        ctx.stroke();
+        ctx.closePath();
+	}
+	
+	
+</script>
+</body>
+</html>

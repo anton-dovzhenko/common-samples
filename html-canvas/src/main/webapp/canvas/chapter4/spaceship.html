@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Spaceship</title>
+<script src="modernizr.js"></script>
+<script src="Debugger.js"></script>
+</head>
+<body>
+	<div style="position: absolute; left: 50px; top: 50px;">
+		<canvas id="canvas" width="500" height ="500">
+			Your browser does not support canvas!
+		</canvas>
+	</div>
+<script>
+	
+	function eventWindowLoaded() {
+		canvasApp();
+	}
+	
+	window.addEventListener("load", eventWindowLoaded, false);
+	
+	function canvasSupport() {
+		return Modernizr.canvas;
+	}
+
+    var ctx;
+    var canvas;
+    var image;
+    var counter = 0;
+	
+	function canvasApp() {
+		if (!canvasSupport()) {
+			return;
+		} else {
+			canvas = document.getElementById("canvas");
+			ctx = canvas.getContext("2d");
+		}
+        image = new Image();
+        image.src = "spaceship.png";
+        image.addEventListener("load", eventShipLoaded, false);
+	}
+
+    function eventShipLoaded(e) {
+        startUp();
+    }
+
+    function startUp() {
+        setInterval(drawScreen, 10);
+    }
+	
+	function drawScreen() {
+        ctx.fillStyle = "#aaaaaa";
+        ctx.fillRect(0, 0, 500, 500);
+        ctx.drawImage(image, 0, counter, 50, 50);
+        counter++;
+        if (counter > 500) {
+            counter = 0;
+        }
+	}
+	
+	
+</script>
+</body>
+</html>

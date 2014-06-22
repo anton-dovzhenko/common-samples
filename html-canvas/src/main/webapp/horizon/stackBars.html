@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hello World</title>
+</head>
+<body>
+	<div style="position: absolute; left: 50px; top: 50px;">
+		<canvas id="canvasOne" width="500" height="500">
+			Your browser does not support canvas!
+		</canvas>
+	</div>
+<script>
+    var ctx;
+    var timer;
+	var progress = 0;
+	var animationCount = 0;
+	var MAX_COUNT = 1;
+    var NUMBER_OF_BARS = 12;
+    var PROGRESS_INTERVAL = 0.03;
+    var INTERVAL_OF_WAVE = 0.15;
+    var WAVE_START = 1 - INTERVAL_OF_WAVE;
+    var WAVE_PEAK =  1 - INTERVAL_OF_WAVE / 2;
+    var ACCELERATION = 0.2;
+
+	//window.addEventListener("load", eventWindowLoaded, false);
+	function eventWindowLoaded() {
+		var canvas = document.getElementById("canvasOne");
+		if (!canvas || !canvas.getContext("2d")) {
+			alert("No canvas support");
+            return;
+		}
+        ctx = canvas.getContext("2d");
+        timer = setInterval(drawCanvas, 20);
+	}
+
+
+	
+	function drawCanvas() {
+        if (progress > 1) {
+            clearInterval(timer);
+        }
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, 500, 500);
+        for (var i = 0; i < NUMBER_OF_BARS; i++) {
+            var delta = getWaveProgress(getIndexProgress(i, progress));
+            drawStackedBar(40 * i, 35, 300, 125 * delta, 75 * delta, 25 * delta);
+        }
+        progress += 0.01;
+	}
+
+    function getIndexProgress(i, progress) {
+        if (progress <= i * PROGRESS_INTERVAL) {
+            return 0;
+        }
+        if (progress >= 1 - NUMBER_OF_BARS * PROGRESS_INTERVAL + i * PROGRESS_INTERVAL) {
+            return 1;
+        }
+        return /*Math.pow(*/progress / (1 - NUMBER_OF_BARS * PROGRESS_INTERVAL + i * PROGRESS_INTERVAL);
+                /*, 1 - i * ACCELERATION);*/
+    }
+
+    function getWaveProgress(progress) {
+        var delta;
+        if (progress < WAVE_START) {
+            delta = progress / WAVE_START;
+        } else if (progress < WAVE_PEAK) {
+            delta = (1 + progress - WAVE_START)
+        } else {
+            delta = (1 + 1 - progress)
+        }
+        return delta;
+    }
+
+    function drawStackedBar(x, width, zero_line, height1, height2, height3) {
+        ctx.fillStyle = "red";
+        ctx.fillRect(x, zero_line - height1, width, height1);
+        ctx.fillStyle = "blue";
+        ctx.fillRect(x, zero_line - height1 - height2, width, height2);
+        ctx.fillStyle = "green";
+        ctx.fillRect(x, zero_line - height1 - height2 - height3, width, height3);
+    }
+
+	window.onload = eventWindowLoaded();
+</script>
+</body>
+</html>

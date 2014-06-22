@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Transformations</title>
+<script src="modernizr.js"></script>
+<script src="Debugger.js"></script>
+</head>
+<body>
+	<div style="position: absolute; left: 50px; top: 50px;">
+		<canvas id="canvas" width="500" height ="500">
+			Your browser does not support canvas!
+		</canvas>
+	</div>
+<script>
+	
+	function eventWindowLoaded() {
+		canvasApp();
+	}
+	
+	window.addEventListener("load", eventWindowLoaded, false);
+	
+	function canvasSupport() {
+		return Modernizr.canvas;
+	}
+
+    var ctx;
+
+	function canvasApp() {
+		if (!canvasSupport()) {
+			return;
+		} else {
+			var canvas = document.getElementById("canvas");
+			ctx = canvas.getContext("2d");
+		}
+		drawScreen();
+	}
+	
+	function drawScreen() {
+        var fillImg = new Image();
+        fillImg.src = "Madagascar-Mort-icon.png";
+        fillImg.onload = function() {
+            var fillPattern = ctx.createPattern(fillImg, "repeat");
+            ctx.fillStyle = fillPattern;
+            ctx.fillRect(0, 0, 500, 500);
+        }
+
+    }
+	
+	
+</script>
+</body>
+</html>

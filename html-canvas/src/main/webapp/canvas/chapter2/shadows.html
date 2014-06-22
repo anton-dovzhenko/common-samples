@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Shadows</title>
+<script src="modernizr.js"></script>
+<script src="Debugger.js"></script>
+</head>
+<body>
+	<div style="position: absolute; left: 50px; top: 50px;">
+		<canvas id="canvas" width="500" height ="500">
+			Your browser does not support canvas!
+		</canvas>
+	</div>
+<script>
+	
+	function eventWindowLoaded() {
+		canvasApp();
+	}
+	
+	window.addEventListener("load", eventWindowLoaded, false);
+	
+	function canvasSupport() {
+		return Modernizr.canvas;
+	}
+
+    var ctx;
+
+	function canvasApp() {
+		if (!canvasSupport()) {
+			return;
+		} else {
+			var canvas = document.getElementById("canvas");
+			ctx = canvas.getContext("2d");
+		}
+		drawScreen();
+	}
+	
+	function drawScreen() {
+
+        ctx.fillStyle = "red";
+
+        ctx.shadowOffsetX = 4;
+        ctx.shadowOffsetY = 4;
+        ctx.shadowColor = "black";
+        ctx.shadowBlur = 4;
+        ctx.fillRect(10, 10, 100, 100);
+
+        ctx.shadowOffsetX = -4;
+        ctx.shadowOffsetY = -4;
+        ctx.shadowColor = "black";
+        ctx.shadowBlur = 4;
+        ctx.fillRect(150, 10, 100, 100);
+
+        ctx.shadowOffsetX = 10;
+        ctx.shadowOffsetY = 10;
+        ctx.shadowColor = "rgb(100, 100, 100)";
+        ctx.shadowBlur = 8;
+        ctx.arc(200, 300, 100, 0, (Math.PI/180) * 360, false);
+        ctx.fill();
+
+    }
+	
+	
+</script>
+</body>
+</html>

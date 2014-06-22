@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ch2BaseFile - Template For Chapter 2 Examples</title>
+<script src="modernizr.js"></script>
+<script src="Debugger.js"></script>
+</head>
+<body>
+	<div style="position: absolute; left: 50px; top: 50px;">
+		<canvas id="canvas" width="500" height ="500">
+			Your browser does not support canvas!
+		</canvas>
+	</div>
+<script>
+	
+	function eventWindowLoaded() {
+		canvasApp();
+	}
+	
+	window.addEventListener("load", eventWindowLoaded, false);
+	
+	function canvasSupport() {
+		return Modernizr.canvas;
+	}
+
+    var ctx;
+
+	function canvasApp() {
+		if (!canvasSupport()) {
+			return;
+		} else {
+			var canvas = document.getElementById("canvas");
+			ctx = canvas.getContext("2d");
+		}
+		drawScreen();
+	}
+	
+	function drawScreen() {
+		ctx.fillStyle = "black";
+		ctx.strokeStyle = "black";
+
+        ctx.beginPath();
+        ctx.lineWidth = 2;
+        ctx.arc(100, 100, 20, (Math.PI / 180) * 0, (Math.PI / 180) * 360, false);
+        ctx.stroke();
+        ctx.closePath();
+
+        ctx.beginPath();
+        ctx.lineWidth = 2;
+        ctx.arc(100, 200, 20, (Math.PI / 180) * 0, (Math.PI / 180) * 90, false);
+        ctx.stroke();
+        ctx.closePath();
+
+        ctx.beginPath();
+        ctx.lineWidth = 2;
+        ctx.arc(200, 200, 20, (Math.PI / 180) * 0, (Math.PI / 180) * 90, true);
+        ctx.stroke();
+        ctx.closePath();
+
+        ctx.beginPath();
+        ctx.lineWidth = 2;
+        ctx.moveTo(0, 0)
+        ctx.lineTo(100, 200);
+        ctx.arcTo(350, 350, 100, 100, 20);
+        ctx.stroke();
+        ctx.closePath();
+    }
+	
+	
+</script>
+</body>
+</html>

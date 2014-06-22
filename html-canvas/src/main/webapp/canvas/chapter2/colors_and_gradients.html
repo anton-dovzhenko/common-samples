@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Transformations</title>
+<script src="modernizr.js"></script>
+<script src="Debugger.js"></script>
+</head>
+<body>
+	<div style="position: absolute; left: 50px; top: 50px;">
+		<canvas id="canvas" width="500" height ="500">
+			Your browser does not support canvas!
+		</canvas>
+	</div>
+<script>
+	
+	function eventWindowLoaded() {
+		canvasApp();
+	}
+	
+	window.addEventListener("load", eventWindowLoaded, false);
+	
+	function canvasSupport() {
+		return Modernizr.canvas;
+	}
+
+    var ctx;
+
+	function canvasApp() {
+		if (!canvasSupport()) {
+			return;
+		} else {
+			var canvas = document.getElementById("canvas");
+			ctx = canvas.getContext("2d");
+		}
+		drawScreen();
+	}
+	
+	function drawScreen() {
+
+        var gr = ctx.createRadialGradient(50, 50, 25, 100, 100, 100);
+        gr.addColorStop(0, "rgb(255, 0, 0)");
+        gr.addColorStop(.5, "rgb(0, 255, 0)");
+        gr.addColorStop(1, "rgb(255, 0, 0)");
+        ctx.fillStyle = gr;
+        ctx.fillRect(0, 0, 200, 200);
+        /*var gr = ctx.createLinearGradient(0, 0, 100, 0);
+        gr.addColorStop(0, "rgb(255, 0, 0)");
+        gr.addColorStop(.5, "rgb(0, 255, 0)");
+        gr.addColorStop(1, "rgb(255, 0, 0)");
+
+        ctx.fillStyle = gr;
+        ctx.fillRect(0, 0, 200, 200);
+
+        gr = ctx.createLinearGradient(0, 0, 0, 100);
+        gr.addColorStop(0, "rgb(255, 0, 0)");
+        gr.addColorStop(.5, "rgb(0, 255, 0)");
+        gr.addColorStop(1, "rgb(255, 0, 0)");
+        ctx.fillStyle = gr;
+        ctx.fillRect(200, 0, 200, 200);
+
+        gr = ctx.createLinearGradient(400, 0, 200, 200);
+        gr.addColorStop(0, "rgb(255, 0, 0)");
+        gr.addColorStop(.5, "rgb(0, 255, 0)");
+        gr.addColorStop(1, "rgb(255, 0, 0)");
+        ctx.fillStyle = gr;
+        ctx.fillRect(400, 0, 200, 200);*/
+
+    }
+	
+	
+</script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Zooming image</title>
+<script src="modernizr.js"></script>
+</head>
+<body>
+	<div style="position: absolute; left: 50px; top: 50px;">
+		<canvas id="canvas" width="500" height ="500">
+			Your browser does not support canvas!
+		</canvas>
+	</div>
+<script>
+	
+	function eventWindowLoaded() {
+		canvasApp();
+	}
+	
+	window.addEventListener("load", eventWindowLoaded, false);
+    document.onkeydown = function(e) {
+        e = e ? e : window.event;
+        console.log(e.keyCode);
+        switch(e.keyCode) {
+            case 38://up
+            windowY -= 10;
+            if (windowY < 0) {
+                windowY = 0;
+            }
+            break;
+            case 40://down
+                windowY += 10;
+                if (windowY > photo.height - windowHeight) {
+                    windowY = photo.height - windowHeight;
+                }
+                break;
+            case 37://left
+                windowX -= 10;
+                if (windowX < 0) {
+                    windowX = 0;
+                }
+                break;
+            case 39://right
+                windowX += 10;
+                if (windowX > photo.width - windowWidth) {
+                    windowX = photo.width - windowWidth;
+                }
+                break;
+            case 109://-
+                currentScale -= scaleIncrement;
+                if (currentScale < minScale) {
+                    currentScale = minScale;
+                }
+                break;
+            case 107://+
+                currentScale += scaleIncrement;
+                if (currentScale > maxScale) {
+                    currentScale = maxScale;
+                }
+        }
+    }
+	
+	function canvasSupport() {
+		return Modernizr.canvas;
+	}
+
+    var photo;
+    var ctx;
+
+    var windowWidth = 500;
+    var windowHeight = 500;
+
+    var windowX = 0;
+    var windowY = 0;
+
+    var currentScale = .5;
+    var minScale = .2;
+    var maxScale = 3;
+    var scaleIncrement = .1;
+	
+	function canvasApp() {
+		if (!canvasSupport()) {
+			return;
+		} else {
+			var canvas = document.getElementById("canvas");
+			ctx = canvas.getContext("2d");
+		}
+
+        photo = new Image();
+        photo.src = "butterfly1.jpg";
+        photo.addEventListener("load", eventPhotoLoaded, false);
+	}
+
+    function eventPhotoLoaded() {
+        startUp();
+    }
+	
+	function drawScreen() {
+        ctx.clearRect(0, 0, 500, 500);
+		ctx.drawImage(photo, windowX, windowY, windowWidth, windowHeight
+                , 0, 0, windowWidth * currentScale, windowHeight * currentScale);
+	}
+
+    function startUp() {
+        setInterval(drawScreen, 100);
+    }
+	
+	
+</script>
+</body>
+</html>

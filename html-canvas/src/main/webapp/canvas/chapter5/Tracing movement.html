@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mathematics</title>
+<script src="modernizr.js"></script>
+<script src="Debugger.js"></script>
+</head>
+<body>
+	<div style="position: absolute; left: 50px; top: 50px;">
+		<canvas id="canvas" width="500" height ="500">
+			Your browser does not support canvas!
+		</canvas>
+	</div>
+<script>
+	
+	function eventWindowLoaded() {
+		canvasApp();
+	}
+	window.addEventListener("load", eventWindowLoaded, false);
+	function canvasSupport() {
+		return Modernizr.canvas;
+	}
+	function canvasApp() {
+		if (!canvasSupport()) {
+			return;
+		} else {
+			canvas = document.getElementById("canvas");
+			ctx = canvas.getContext("2d");
+		}
+        startUp();
+	}
+
+    var canvas;
+    var ctx;
+    var speed = 5;
+    var p1 = {x :20, y : 20};
+    var p2 = {x : 480, y : 250};
+    var dx = p2.x - p1.x;
+    var dy = p2.y - p1.y;
+    var distance = Math.sqrt(dx * dx + dy * dy);
+    var moves = distance / speed;
+    var xUnits = (p2.x - p1.x) / moves;
+    var yUnits = (p2.y - p1.y) / moves;
+    var ball = {x : p1.x, y : p1.y};
+
+    var points = new Array();
+
+    function startUp() {
+        setInterval(drawScreen, 33);
+    }
+
+	function drawScreen() {
+
+
+        if (moves > 0) {
+            ctx.fillStyle = "#FFFFFF";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            moves--;
+            ball.x += xUnits;
+            ball.y += yUnits;
+            console.log("ball.x + " + ball.x + "; ball.y = " + ball.y);
+            points.push({x : ball.x, y : ball.y});
+            ctx.fillStyle = "#000000";
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, 15, 0, Math.PI * 2, true);
+            ctx.closePath();
+            ctx.fill();
+
+            for (var i = 0; i < points.length; i++) {
+                ctx.fillStyle = "#000000";
+                ctx.beginPath();
+                ctx.arc(points[i].x, points[i].y, 2, 0, Math.PI * 2, true);
+                ctx.closePath();
+                ctx.fill();
+            }
+        }
+	}
+	
+	
+</script>
+</body>
+</html>

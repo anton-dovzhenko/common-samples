@@ -1,0 +1,64 @@
+<html>  
+ <head>  
+  <script type="application/javascript">
+
+	/*
+		METHODS:
+		drawImage(image, x, y, width, height);
+		drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+	*/
+	
+    function draw() {  
+		var ctx = document.getElementById('canvas').getContext('2d');
+		var img = new Image();
+		img.src = 'https://developer.mozilla.org/samples/canvas-tutorial/images/backdrop.png';
+		img.onload = function(){
+			ctx.drawImage(img,0,0);
+			ctx.beginPath();
+			ctx.moveTo(30,96);
+			ctx.lineTo(70,66);
+			ctx.lineTo(103,76);
+			ctx.lineTo(170,15);
+			ctx.stroke();
+		}
+	}
+	
+	function drawRhino() {
+		var ctx = document.getElementById('rhino').getContext('2d');
+		var img = new Image();
+		img.src = 'https://developer.mozilla.org/samples/canvas-tutorial/images/rhino.jpg';
+		img.onload = function(){
+			for (i=0;i<4;i++){
+				for (j=0;j<3;j++){
+					ctx.drawImage(img,j*50,i*38,50,38);
+				}
+			}
+		}
+	}
+	
+	function drawRhinoInFrame() {
+	    var ctx = document.getElementById('rhinoInFrame').getContext('2d');
+	    var rhino = new Image();
+	    rhino.src = 'https://developer.mozilla.org/samples/canvas-tutorial/images/rhino.jpg';
+		
+		var frame = new Image();
+	    frame.src ='https://developer.mozilla.org/samples/canvas-tutorial/images/picture_frame.png';
+		
+		frame.onload = function(){
+			ctx.drawImage(frame,0,0);
+		}
+		
+		rhino.onload = function(){
+			ctx.drawImage(rhino,33,71,104,124,21,20,87,104);
+		}
+	}
+
+  </script>  
+ </head>  
+ <body onload="draw();drawRhino();drawRhinoInFrame();">  
+	<canvas id="canvas" width="200" height="150"></canvas>
+	<img src="https://developer.mozilla.org/samples/canvas-tutorial/images/backdrop.png" valign="top"/>
+	<canvas id="rhino" width="200" height="150"></canvas>
+	<canvas id="rhinoInFrame" width="200" height="150"></canvas>
+ </body>  
+</html>

@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Text</title>
+<script src="modernizr.js"></script>
+<script src="Debugger.js"></script>
+</head>
+<body>
+	<div style="position: absolute; left: 50px; top: 50px;">
+		<canvas id="canvas" width="500" height ="300">
+			Your browser does not support canvas!
+		</canvas>
+    </div>
+    <div style="position: absolute; right: 50px; top: 50px;">
+        <form>
+            <table>
+                <tr>
+                    <td>
+                        Text:
+                    </td>
+                    <td>
+                        <input id="textBox" placeholder="your text"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Fill Or Stroke:
+                    </td>
+                    <td>
+                        <select id="fillOrStroke">
+                            <option value="fill">fill</option>
+                            <option value="stroke">stroke</option>
+                            <option value="both">both</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Font Style:</td>
+                    <td>
+                        <select id="fontStyle">
+                        <option value="normal">normal</option>
+                        <option value="italic">italic</option>
+                        <option value="oblique">oblique</option>
+                    </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Font Weight:</td>
+                    <td>
+                        <select id="fontWeight">
+                            <option value="normal">normal</option>
+                            <option value="bold">bold</option>
+                            <option value="bolder">bolder</option>
+                            <option value="lighter">lighter</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Font Faces:</td>
+                    <td>
+                        <select id="textFont">
+                            <option value="serif">serif</option>
+                            <option value="sans-serif">sans-serif</option>
+                            <option value="cursive">cursive</option>
+                            <option value="fantasy">fantasy</option>
+                            <option value="monospace">monospace</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Font Size:</td>
+                    <td><input type="range" id="textSize" min="0" max="200" step="1" value="50"/></td>
+                </tr>
+                <tr>
+                    <td>Font Color:</td>
+                    <td><input type="color" id="textColor"/></td>
+                </tr>
+                <tr>
+                    <td>Text Baseline:</td>
+                    <td>
+                        <select id="textBaseline">
+                            <option value="middle">middle</option>
+                            <option value="top">top</option>
+                            <option value="hanging">hanging</option>
+                            <option value="alphabetic">alphabetic</option>
+                            <option value="ideographic">ideographic</option>
+                            <option value="bottom">bottom</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Text Align:</td>
+                    <td>
+                        <select id="textAlign">
+                            <option value="center">center</option>
+                            <option value="start">start</option>
+                            <option value="end">end</option>
+                            <option value="left">left</option>
+                            <option value="right">right</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Alpha:</td>
+                    <td><input type="range" id="textAlpha" min="0.0" max="1.0" step="0.01" value="1"/></td>
+                </tr>
+                <tr>
+                    <td>Shadow X:</td>
+                    <td><input type="range" id="shadowX" min="-100" max="100" step="1" value="1"/></td>
+                </tr>
+                <tr>
+                    <td>Shadow Y:</td>
+                    <td><input type="range" id="shadowY" min="-100" max="100" step="1" value="1"/></td>
+                </tr>
+                <tr>
+                    <td>Shadow Blur:</td>
+                    <td><input type="range" id="shadowBlur" min="1" max="100" step="1" value="1"/></td>
+                </tr>
+                <tr>
+                    <td>Shadow Color:</td>
+                    <td><input type="color" id="shadowColor" value="#707070"/></td>
+                </tr>
+                <tr>
+                    <td>Canvas width:</td>
+                    <td><input type="range" id="canvasWidth" min="1" max="1000" step="1" value="500"/></td>
+                </tr>
+                <tr>
+                    <td>Canvas Height:</td>
+                    <td><input type="range" id="canvasHeight" min="1" max="1000" step="1" value="300"/></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+<script>
+	
+	function eventWindowLoaded() {
+		canvasApp();
+	}
+	
+	window.addEventListener("load", eventWindowLoaded, false);
+	
+	function canvasSupport() {
+		return Modernizr.canvas;
+	}
+
+    var message = "your text";
+    var fillOrStroke = "fill";
+    var fontSize = "50";
+    var fontFace = "serif";
+    var fontWeight = "normal";
+    var fontStyle = "normal";
+    var textFillColor = "black";
+    var textBaseline = "middle";
+    var textAlign = "center";
+    var textAlpha = 1;
+    var shadowX = 0;
+    var shadowY = 0;
+    var shadowBlur = 0;
+    var shadowColor = "#FFFFFF";
+    var canvas;
+    var ctx;
+
+	function canvasApp() {
+		if (!canvasSupport()) {
+			return;
+		} else {
+			canvas = document.getElementById("canvas");
+			ctx = canvas.getContext("2d");
+		}
+
+        var formElement = document.getElementById("textBox");
+        formElement.addEventListener("keyup", textBoxChanged, false);
+
+        formElement = document.getElementById("fillOrStroke");
+        formElement.addEventListener("change", fillOrStrokeChanged, false);
+
+        formElement = document.getElementById("textSize");
+        formElement.addEventListener("change", textSizeChanged, false);
+
+        formElement = document.getElementById("textFont");
+        formElement.addEventListener("change", fontFaceChanged, false);
+
+        formElement = document.getElementById("fontWeight");
+        formElement.addEventListener("change", fontWeightChanged, false);
+
+        formElement = document.getElementById("fontStyle");
+        formElement.addEventListener("change", fontStyleChanged, false);
+
+        formElement = document.getElementById("textColor");
+        formElement.addEventListener("change", textFillColorChanged, false);
+
+        formElement = document.getElementById("textBaseline");
+        formElement.addEventListener("change", textBaselineChanged, false);
+
+        formElement = document.getElementById("textAlign");
+        formElement.addEventListener("change", textAlignChanged, false);
+
+        formElement = document.getElementById("textAlpha");
+        formElement.addEventListener("change", textAlphaChanged, false);
+
+        formElement = document.getElementById("shadowX");
+        formElement.addEventListener("change", shadowXChanged, false);
+
+        formElement = document.getElementById("shadowY");
+        formElement.addEventListener("change", shadowYChanged, false);
+
+        formElement = document.getElementById("shadowBlur");
+        formElement.addEventListener("change", shadowBlurChanged, false);
+
+        formElement = document.getElementById("shadowColor");
+        formElement.addEventListener("change", shadowColorChanged, false);
+
+        formElement = document.getElementById("canvasHeight");
+        formElement.addEventListener("change", canvasHeightChanged, false);
+
+        formElement = document.getElementById("canvasWidth");
+        formElement.addEventListener("change", canvasWidthChanged, false);
+
+		drawScreen();
+	}
+
+    function textBoxChanged(e) {
+        var target = e.target;
+        message = target.value;
+        drawScreen();
+    }
+
+    function fillOrStrokeChanged(e) {
+        var target = e.target;
+        fillOrStroke = target.value;
+        drawScreen();
+    }
+
+    function textSizeChanged(e) {
+        var target = e.target;
+        fontSize = target.value;
+        drawScreen();
+    }
+
+    function fontFaceChanged(e) {
+        var target = e.target;
+        fontFace = target.value;
+        drawScreen();
+    }
+
+    function fontWeightChanged(e) {
+        var target = e.target;
+        fontWeight = target.value;
+        drawScreen();
+    }
+
+    function fontStyleChanged(e) {
+        var target = e.target;
+        fontStyle = target.value;
+        drawScreen();
+    }
+
+    function textFillColorChanged(e) {
+        var target = e.target;
+        textFillColor = target.value;
+        drawScreen();
+    }
+
+    function textBaselineChanged(e) {
+        var target = e.target;
+        textBaseline = target.value;
+        drawScreen();
+    }
+
+    function textAlignChanged(e) {
+        var target = e.target;
+        textAlign = target.value;
+        drawScreen();
+    }
+
+    function textAlphaChanged(e) {
+        var target = e.target;
+        textAlpha = target.value;
+        drawScreen();
+    }
+
+    function shadowXChanged(e) {
+        var target = e.target;
+        shadowX = target.value;
+        drawScreen();
+    }
+
+    function shadowYChanged(e) {
+        var target = e.target;
+        shadowY = target.value;
+        drawScreen();
+    }
+
+    function shadowBlurChanged(e) {
+        var target = e.target;
+        shadowBlur = target.value;
+        drawScreen();
+    }
+
+    function shadowColorChanged(e) {
+        var target = e.target;
+        shadowColor = target.value;
+        drawScreen();
+    }
+
+    function canvasHeightChanged(e) {
+        var target = e.target;
+        canvas.height = target.value;
+        drawScreen();
+    }
+
+    function canvasWidthChanged(e) {
+        var target = e.target;
+        canvas.width = target.value;
+        drawScreen();
+    }
+	
+	function drawScreen() {
+        ctx.globalAlpha = 1;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = "#ffffaa";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.strokeStyle = "#000000";
+        ctx.strokeRect(5, 5, canvas.width - 10, canvas.height - 10);
+
+        ctx.globalAlpha = textAlpha;
+        ctx.shadowColor = shadowColor;
+        ctx.shadowOffsetX = shadowX;
+        ctx.shadowOffsetY = shadowY;
+        ctx.shadowBlur = shadowBlur;
+        ctx.font = fontWeight + " " + fontStyle + " " + fontSize + "px " + fontFace;
+        ctx.textBaseline = textBaseline;
+        ctx.textAlign = textAlign;
+        var metrics = ctx.measureText(message);
+        var textWidth = metrics.width;
+        var xPosition = canvas.width / 2;
+        var yPosition = canvas.height / 2;
+
+        switch(fillOrStroke) {
+            case "fill":
+                ctx.fillStyle = textFillColor;
+                ctx.fillText(message, xPosition, yPosition);
+                break;
+            case "stroke":
+                ctx.strokeStyle = textFillColor;
+                ctx.strokeText(message, xPosition, yPosition);
+                break;
+            case "both":
+                ctx.fillStyle = textFillColor;
+                ctx.fillText(message, xPosition, yPosition);
+                ctx.strokeStyle = textFillColor;
+                ctx.strokeText(message, xPosition, yPosition);
+                break;
+        }
+
+    }
+	
+	
+</script>
+</body>
+</html>
