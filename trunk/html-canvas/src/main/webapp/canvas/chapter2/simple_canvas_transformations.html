@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Transformations</title>
+<script src="modernizr.js"></script>
+<script src="Debugger.js"></script>
+</head>
+<body>
+	<div style="position: absolute; left: 50px; top: 50px;">
+		<canvas id="canvas" width="500" height ="500">
+			Your browser does not support canvas!
+		</canvas>
+	</div>
+<script>
+	
+	function eventWindowLoaded() {
+		canvasApp();
+	}
+	
+	window.addEventListener("load", eventWindowLoaded, false);
+	
+	function canvasSupport() {
+		return Modernizr.canvas;
+	}
+
+    var ctx;
+
+	function canvasApp() {
+		if (!canvasSupport()) {
+			return;
+		} else {
+			var canvas = document.getElementById("canvas");
+			ctx = canvas.getContext("2d");
+		}
+		drawScreen();
+	}
+	
+	function drawScreen() {
+        ctx.fillStyle = "black";
+        ctx.fillRect(20, 20, 25, 25);
+
+		ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.translate(125, 125);
+        var angleInRadians = 45 * Math.PI / 180;
+        ctx.rotate(angleInRadians);
+        ctx.fillStyle = "red";
+        ctx.fillRect(-25, -25, 50, 50);
+
+        ctx.fillStyle = "black";
+        ctx.fillRect(100, 100, 50, 50);
+        ctx.scale(2, 2);
+        ctx.fillStyle = "red";
+        ctx.fillRect(100, 100, 50, 50);
+
+
+    }
+	
+	
+</script>
+</body>
+</html>

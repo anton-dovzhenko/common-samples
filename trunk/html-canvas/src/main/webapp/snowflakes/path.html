@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Path</title>
+</head>
+<body>
+	<canvas id="canvasOne" height="300px" width="500px">
+			Your browser does not support canvas!
+	</canvas>
+<script>
+    var canvas;
+    var ctx;
+    var a = 0;
+    var b = 0;
+    var c = 0;
+	var SHOT_PER_PERIOD = 800;
+	var count = 0;
+	var rotation_count = 0;
+	var direction = true;
+	//window.addEventListener("load", eventWindowLoaded, false);
+	function eventWindowLoaded() {
+		canvas = document.getElementById("canvasOne");
+		if (!canvas || !canvas.getContext("2d")) {
+			alert("No canvas support");
+		} else {
+            ctx = canvas.getContext("2d");
+            maximizeCanvas();
+            calculateCoefficients();
+			drawCanvas();
+		}
+	}
+
+    function maximizeCanvas() {
+        canvas.width = 500;//window.innerWidth;
+        canvas.height = 300;//window.innerHeight;
+    }
+
+    function calculateCoefficients() {
+        a = 4.0 * canvas.height / (canvas.width * canvas.width);
+        b = - 4.0 * canvas.height / canvas.width;
+        c = canvas.height;
+    }
+
+    function pathParabola(x) {
+        return a * x * x + b * x + c;
+    }
+	
+	function drawCanvas() {
+		 setTimeout(function(){drawScreen()}, 5);
+	}
+	
+	function clearCanvas() {
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+	}
+	
+	function drawScreen() {
+        clearCanvas();
+        ctx.fillStyle = "red";
+        var x = 1.0 * count * canvas.width / SHOT_PER_PERIOD;
+        //ctx.fillRect(x, pathParabola(x), 5, 5);
+        ctx.beginPath();
+        ctx.arc(x, pathParabola(x), 15, 0, Math.PI * 2, true);
+        ctx.closePath();
+        ctx.fill();
+        if (direction) {
+            count++;
+            if (count == SHOT_PER_PERIOD) {
+                direction = false;
+            }
+        } else {
+            count--;
+            if (count == 0) {
+                direction = true;
+            }
+        }
+        drawCanvas();
+	}
+	
+	window.onload = eventWindowLoaded();
+</script>
+</body>
+</html>

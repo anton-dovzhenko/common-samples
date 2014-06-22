@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Guess The Letter</title>
+<script src="modernizr.js"></script>
+<script src="Debugger.js"></script>
+</head>
+<body>
+	<div style="position: absolute; left: 50px; top: 50px;">
+		<canvas id="canvasOne" width="500" height="300">
+			Your browser does not support canvas!
+		</canvas>
+		<form>
+			<input type="button" id="createImageDate" value="Export Canvas Image"/>
+		</form>
+	</div>
+<script>
+	//window.addEventListener("load", eventWindowLoaded, false);
+	
+	var guesses = 0;
+	var message = "Guess he Letter Form a (lower) to z (higher)";
+	var letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o",
+		"p","q","r","s","t","u","v","w","x","y","z"];
+	var today = new Date();
+	var letterToGuess  = "";
+	var higherOrLower = "";
+	var gameOver = false;
+	var lettersGuessed = [];
+	var canvas;
+	var ctx;
+	
+	function eventWindowLoaded() {
+	if (!Modernizr.canvas) {
+			alert("No canvas support");
+			return;
+		}
+		canvas = document.getElementById("canvasOne");
+		ctx = canvas.getContext("2d");
+		initGame();
+	}
+	window.onload = eventWindowLoaded();
+	
+	function initGame() {
+		var letterIndex = Math.floor(Math.random() * letters.length);
+		letterToGuess = letters[letterIndex];
+		var guesses = 0;
+		lettersGuessed = [];
+		gameOver = false;
+		window.addEventListener("keyup", eventKeyPressed, true);
+		drawScreen();
+	}
+	
+	function eventKeyPressed(e) {
+		if (!gameOver) {
+			var letterPressed = String.fromCharCode(e.keyCode);
+			letterPressed = letterPressed.toLowerCase();
+			guesses++;
+			lettersGuessed.push(letterPressed);
+			if (letterPressed == letterToGuess) {
+				gameOver = true;
+			} else {
+				letterIndex = letters.indexOf(letterToGuess);
+				guessIndex = letters.indexOf(letterPressed);
+				if (guessIndex < 0) {
+					higherOrLower = "This is not a letter";
+				} else if (guessIndex > letterIndex) {
+					higherOrLower = "Lower";
+				} else {
+					higherOrLower = "Higher";
+				}
+			}
+		}
+		drawScreen();
+	}
+	
+	function drawScreen() {
+	
+		ctx.fillStyle = "#ffffaa";
+		ctx.fillRect(0, 0, 500, 300);
+		
+		ctx.strokeStyle = "#000000";
+		ctx.strokeRect(5, 5, 490, 290);
+		
+		ctx.textDaseline = "top";
+		
+		//Date
+		ctx.fillStyle = "#000000";
+		ctx.font = "10px_sans";
+		ctx.fillText(today, 110, 20);
+		
+		//Message
+		ctx.fillStyle = "#FF0000";
+		ctx.font = "14px_sans";
+		ctx.fillText(message, 140, 40);
+		
+		//Guesses
+		ctx.fillStyle = "#109910";
+		ctx.font = "16px_sans";
+		ctx.fillText("Guesses: " + guesses, 215, 60);
+		
+		//Higher Or Lower
+		ctx.fillStyle = "#000000";
+		ctx.font = "16px_sans";
+		ctx.fillText("Higher Or Lower: " + higherOrLower, 150, 135);
+		
+		//Letters Guessed
+		ctx.fillStyle = "#FF0000";
+		ctx.font = "40px_sans";
+		ctx.fillText("Letters Guessed: " + lettersGuessed.toString(), 10, 270);
+		
+		if (gameOver) {
+			ctx.fillStyle = "#FF0000";
+			ctx.font = "40px_sans";
+			ctx.fillText("You Got It!", 150, 190);
+		}
+	}
+	
+	var formElement = document.getElementById("createImageDate");
+	formElement.addEventListener("click", createImageDataPressed, false);
+	
+	function createImageDataPressed(e) {
+		window.open(canvas.toDataURL(), "canvasImage", "left=0,top=0,width="
+			+ canvas.width + ",height=" + canvas.height + ",toolbar=0, resizable=0");
+	}
+	
+</script>
+</body>
+</html>

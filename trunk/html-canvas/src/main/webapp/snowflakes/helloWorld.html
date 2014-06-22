@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hello World</title>
+</head>
+<body>
+	<div style="position: absolute; left: 50px; top: 50px;">
+		<canvas id="canvasOne" width="500px" heigh="500px">
+			Your browser does not support canvas!
+		</canvas>
+	</div>
+<script>
+	var count = 0;
+	var animationCount = 0;
+	var MAX_COUNT = 81;
+	//window.addEventListener("load", eventWindowLoaded, false);
+	function eventWindowLoaded() {
+		var canvas = document.getElementById("canvasOne");
+		if (!canvas || !canvas.getContext("2d")) {
+			alert("No canvas support");
+		} else {
+			drawCanvas(canvas.getContext("2d"));
+		}
+	}
+	
+	function drawCanvas(ctx) {
+		for (var i = 0; i < 82; i++) {
+			setTimeout(function(){drawRects(ctx)}, 75 * i);
+		}
+	}
+	
+	function drawRects(ctx) {
+		if (animationCount % 2 == 0) {		
+			ctx.fillStyle = "rgb(200,0,0)";
+			ctx.fillRect(100 - count, 100 - count, 50, 50);
+			
+			ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
+			ctx.fillRect(20 + count, 20 + count, 50, 50);
+			
+			ctx.fillStyle = "rgba(0, 200, 0, 0.2)";
+			ctx.beginPath();
+			ctx.arc(85, 85, count, 0, Math.PI*2, true); 
+			ctx.closePath();
+			ctx.fill();
+			
+		} else {
+			ctx.fillStyle = "rgb(200,0,0)";
+			ctx.fillRect(20 + count, 100 - count, 50, 50);
+			
+			ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
+			ctx.fillRect(100 - count, 20 + count, 50, 50);
+			
+			ctx.fillStyle = "rgba(0, 200, 0, 0.2)";
+			ctx.beginPath();
+			ctx.arc(85, 85, count, 0, Math.PI*2, true); 
+			ctx.closePath();
+			ctx.fill();
+			
+		}
+		count++;
+		if (count == MAX_COUNT) {
+			animationCount++;
+			count = 0;
+			ctx.fillStyle = "rgb(0,0,0)";
+			ctx.clearRect(0, 0, 500, 500);
+			drawCanvas(ctx);
+		}
+	}
+	window.onload = eventWindowLoaded();
+</script>
+</body>
+</html>

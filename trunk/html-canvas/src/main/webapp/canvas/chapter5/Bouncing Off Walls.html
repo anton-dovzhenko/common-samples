@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mathematics</title>
+<script src="modernizr.js"></script>
+<script src="Debugger.js"></script>
+</head>
+<body>
+	<div style="position: absolute; left: 50px; top: 50px;">
+		<canvas id="canvas" width="500" height ="500">
+			Your browser does not support canvas!
+		</canvas>
+	</div>
+<script>
+	
+	function eventWindowLoaded() {
+		canvasApp();
+	}
+	window.addEventListener("load", eventWindowLoaded, false);
+
+    function canvasSupport() {
+		return Modernizr.canvas;
+	}
+
+    function canvasApp() {
+
+		if (!canvasSupport()) {
+			return;
+		}
+
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+
+        var speed = 3;
+        var p1 = {x : 20, y : 20};
+        var angle = 75;
+        var radians = 0;
+        var xunits = 0;
+        var yunits = 0;
+        var radius = 15;
+        var ball = {x : p1.x, y : p1.y};
+        var radian = Math.PI / 180;
+
+        function drawScreen() {
+
+            ctx.fillStyle = "#EEEEEE";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.strokeStyle = "#000000";
+            //canvas.strokeRect(1, 1, canvas.width - 2, canvas.height - 2);
+
+            ball.x += xunits;
+            ball.y += yunits;
+
+            ctx.fillStyle = "#000000";
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, radius, 0, Math.PI * 2, true);
+            ctx.closePath();
+            ctx.fill();
+
+            if (ball.x > canvas.width - radius || ball.x < radius) {
+                angle = 180 - angle;
+                updateBall();
+            } else if (ball.y > canvas.height - radius || ball.y < radius) {
+                angle = 360 - angle;
+                updateBall();
+            }
+        }
+
+        function updateBall() {
+            radians = angle * radian;
+            xunits = Math.cos(radians) * speed;
+            yunits = Math.sin(radians) * speed;
+        }
+
+        updateBall();
+
+        setInterval(drawScreen, 7);
+	}
+
+	
+	
+</script>
+</body>
+</html>

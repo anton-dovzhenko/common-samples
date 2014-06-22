@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hello World</title>
+<script src="modernizr.js"></script>
+<script src="Debugger.js"></script>
+</head>
+<body>
+	<div style="position: absolute; left: 50px; top: 50px;">
+		<canvas id="canvasOne" width="500" height="300">
+			Your browser does not support canvas!
+		</canvas>
+		<button onclick="exportCanvasImage()">Export Canvas Image</button>
+	</div>
+<script>
+	//window.addEventListener("load", eventWindowLoaded, false);
+	
+	function eventWindowLoaded() {
+		if (!Modernizr.canvas) {
+			alert("No canvas support");
+			return;
+		}
+		var canvas = document.getElementById("canvasOne");
+		drawScreen(canvas.getContext("2d"));
+	}
+	
+	function drawScreen(ctx) {
+		ctx.fillStyle = "#ffffaa";
+		ctx.fillRect(0, 0, 500, 300);
+		ctx.fillStyle = "#000000";
+		ctx.font = "20px_sans";
+		ctx.textDaseline = "top";
+		ctx.fillText("Hello World!", 195, 80);
+		var helloWorldImage = new Image();
+		helloWorldImage.src = "Madagascar-Mort-icon.png"
+		helloWorldImage.onload = function() {
+			ctx.drawImage(helloWorldImage, 10, 10);
+		}
+		ctx.strokeStyle = "#000000";
+		ctx.strokeRect(5, 5, 490, 290);
+		Debugger.log("Successful canvas initialization");
+	}
+	
+	function exportCanvasImage() {
+		alert("Canvas Export " + canvas);
+	}
+	
+	window.onload = eventWindowLoaded();
+</script>
+</body>
+</html>
