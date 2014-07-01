@@ -49,15 +49,13 @@
     <div id="ball"></div>
 </div>
 <div id="scoreBoard">
-    1 - 1
+    0 - 0
 </div>
 
 <script src="jQuery/jquery-1.9.1.js"></script>
 
 <script>
     (function() {
-
-        var interval = 25;
 
         var xStart = 100;
         var xEnd = 500;
@@ -70,15 +68,7 @@
         var score1 = 0;
         var score2 = 0;
 
-        var ball = {
-            x: 10
-            , y: 10
-            , size: 20
-            , speed: 4
-            , angle: 85
-            , velocityX: Math.cos(10 * Math.PI / 180) * 4
-            , velocityY: Math.sin(10 * Math.PI / 180) * 4
-        }
+        var ball = new Ball(10, 10, 20, 4, 45);
 
         var $field = $('#field');
         var $ball = $('#ball');
@@ -94,13 +84,14 @@
         function drawScreen() {
             $ball.css('left', ball.x);
             $ball.css('top', ball.y);
+
             ball.x = ball.x + ball.velocityX;
             ball.y = ball.y + ball.velocityY;
 
             if (ball.y <= playerHeight + playerPadding && ball.y >= playerHeight + playerPadding - ball.speed) {
                 var playerLeft = parseInt($player2.css('left'));
                 if (ball.x < playerLeft + playerWidth && ball.x + ball.size > playerLeft) {
-                    ball.angle = 360 - ball.angle;
+                    ball.setAngle(360 - ball.angle);
                 }
             }
 
@@ -108,7 +99,7 @@
                     && ball.y <= fieldHeight - playerHeight - playerPadding  - ball.size + ball.speed) {
                 var playerLeft = parseInt($player1.css('left'));
                 if (ball.x < playerLeft + playerWidth && ball.x + ball.size > playerLeft) {
-                    ball.angle = 360 - ball.angle;
+                    ball.setAngle(360 - ball.angle);
                 }
             }
 
@@ -122,34 +113,57 @@
                 goal();
             }
 
-
-
             if (ball.x <= 0 || ball.x >= fieldWidth - ball.size) {
                 if (ball.angle >= 0 && ball.angle < 180) {
-                    ball.angle = 180 - ball.angle;
+                    ball.setAngle(180 - ball.angle);
                 }
                 if (ball.angle >= 180 && ball.angle < 360) {
-                    ball.angle = 270 * 2 - ball.angle;
+                    ball.setAngle(270 * 2 - ball.angle);
                 }
             }
-            ball.velocityX = Math.cos(ball.angle * Math.PI / 180) * ball.speed;
-            ball.velocityY = Math.sin(ball.angle  * Math.PI / 180) * ball.speed;
         }
 
         function goal() {
             $scoreBoard.text(score1 + ' - ' + score2);
-            ball = {
-                x: 30
-                , y: 30
-                , size: 20
-                , speed: 4
-                , angle: 85
-                , velocityX: Math.cos(10 * Math.PI / 180) * 4
-                , velocityY: Math.sin(10 * Math.PI / 180) * 4
+            ball.x = 30;
+            ball.y = 30;
+            ball.setAngle(45);
+        }
+
+        setInterval(drawScreen, 25);
+
+
+        function Ball(x, y, size, speed, angle) {
+            this.x = x;
+            this.y = y;
+            this.size = size;
+            this.speed = speed;
+            this.setAngle = function (angle) {
+                this.angle = angle;
+                this.velocityX = Math.cos(this.angle * Math.PI / 180) * this.speed;
+                this.velocityY = Math.sin(this.angle * Math.PI / 180) * this.speed;
+            }
+
+            this.setAngle(angle);
+        }
+
+        function Player(height, width, padding, position) {
+            this.height = height;
+            this.width = width;
+            this.padding = padding;
+            this.position = position;
+
+            this.getLeft = function() {
+                return this.position - this.width / 2;
             }
         }
 
-        setInterval(drawScreen, 25)
+        function PingPongJsController() {
+
+            this.player1 = new Player(20, 100, 5, (xStart + xEnd) / 2);
+            this.player2 = new Player(20, 100, 5, (xStart + xEnd) / 2);
+        }
+
     })();
 </script>
 
