@@ -1,0 +1,35 @@
+#field {
+    position: absolute;
+    left: 100px;
+    top: 50px;
+    width: 400px;
+    height: 500px;
+    background-color: #000000;
+}
+.player {
+    position: absolute;
+    height: 10px;
+    width: 100px;
+    background-color: #ffffff;
+}
+#player2 {
+    top: 5px;
+    left: 150px;
+}
+#player1 {
+    bottom: 5px;
+    left: 150px;
+}
+#ball {
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    top: 5px;
+    left: 5px;
+    background-color: #ffffff;
+}
+#scoreBoard {
+    position: absolute;
+    left: 550px;
+    top: 50px;
+}

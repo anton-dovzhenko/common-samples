@@ -2,44 +2,9 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
-    <style>
-        #field {
-            position: absolute;
-            left: 100px;
-            top: 50px;
-            width: 400px;
-            height: 500px;
-            background-color: #000000;
-        }
-        .player {
-            position: absolute;
-            height: 10px;
-            width: 100px;
-            background-color: #ffffff;
-        }
-        #player2 {
-            top: 5px;
-            left: 150px;
-        }
-        #player1 {
-            bottom: 5px;
-            left: 150px;
-        }
-        #ball {
-            position: absolute;
-            height: 20px;
-            width: 20px;
-            top: 5px;
-            left: 5px;
-            background-color: #ffffff;
-        }
-        #scoreBoard {
-            position: absolute;
-            left: 550px;
-            top: 50px;
-        }
-    </style>
-    <title></title>
+    <link rel="shortcut icon" href="pingpong.png">
+    <link rel="stylesheet" type="text/css" href="pingpong.css">
+    <title>Ajax</title>
 </head>
 <body>
 
@@ -57,81 +22,24 @@
 <script>
     (function() {
 
-        var xStart = 100;
-        var xEnd = 500;
-        var fieldHeight = 500;
-        var fieldWidth = xEnd - xStart;
-        var playerWidth = 100;
-        var playerHeight = 20;
-        var playerPadding = 5;
-
-        var score1 = 0;
-        var score2 = 0;
-
-        var ball = new Ball(10, 10, 20, 4, 45);
-
         var $field = $('#field');
         var $ball = $('#ball');
         var $player1 = $('#player1');
         var $player2 = $('#player2');
         var $scoreBoard = $('#scoreBoard');
 
-        $field.mousemove(function(event) {
-            $player1.css('left', (event.pageX - 100 - playerWidth / 2));
-            $player2.css('left', (event.pageX - 100 - playerWidth / 2));
-        });
-
-        function drawScreen() {
-            $ball.css('left', ball.x);
-            $ball.css('top', ball.y);
-
-            ball.x = ball.x + ball.velocityX;
-            ball.y = ball.y + ball.velocityY;
-
-            if (ball.y <= playerHeight + playerPadding && ball.y >= playerHeight + playerPadding - ball.speed) {
-                var playerLeft = parseInt($player2.css('left'));
-                if (ball.x < playerLeft + playerWidth && ball.x + ball.size > playerLeft) {
-                    ball.setAngle(360 - ball.angle);
-                }
-            }
-
-            if (ball.y >= fieldHeight - playerHeight - playerPadding - ball.size
-                    && ball.y <= fieldHeight - playerHeight - playerPadding  - ball.size + ball.speed) {
-                var playerLeft = parseInt($player1.css('left'));
-                if (ball.x < playerLeft + playerWidth && ball.x + ball.size > playerLeft) {
-                    ball.setAngle(360 - ball.angle);
-                }
-            }
-
-            if (ball.y <= 0) {
-                score1++;
-                goal();
-            }
-
-            if ( ball.y >= fieldHeight - ball.size) {
-                score2++;
-                goal();
-            }
-
-            if (ball.x <= 0 || ball.x >= fieldWidth - ball.size) {
-                if (ball.angle >= 0 && ball.angle < 180) {
-                    ball.setAngle(180 - ball.angle);
-                }
-                if (ball.angle >= 180 && ball.angle < 360) {
-                    ball.setAngle(270 * 2 - ball.angle);
-                }
-            }
-        }
-
-        function goal() {
+        var callback =  function(player1Left, player2Left, ballTop, ballLeft, score1, score2) {
+            $ball.css('left', ballLeft);
+            $ball.css('top', ballTop);
+            $player1.css('left', player1Left);
+            $player2.css('left', player2Left);
             $scoreBoard.text(score1 + ' - ' + score2);
-            ball.x = 30;
-            ball.y = 30;
-            ball.setAngle(45);
-        }
+        };
+        var controller = new PingPongJsController(callback);
 
-        setInterval(drawScreen, 25);
-
+        $field.mousemove(function(event) {
+            controller.playerMoved(event.pageX);
+        });
 
         function Ball(x, y, size, speed, angle) {
             this.x = x;
@@ -147,21 +55,78 @@
             this.setAngle(angle);
         }
 
-        function Player(height, width, padding, position) {
+        function Player(height, width, padding, left) {
             this.height = height;
             this.width = width;
             this.padding = padding;
-            this.position = position;
+            this.left = left;
 
-            this.getLeft = function() {
-                return this.position - this.width / 2;
-            }
         }
 
-        function PingPongJsController() {
+        function PingPongJsController(callback) {
 
-            this.player1 = new Player(20, 100, 5, (xStart + xEnd) / 2);
-            this.player2 = new Player(20, 100, 5, (xStart + xEnd) / 2);
+            this.playerMoved = function(x) {
+                player1.left = x - 100 - player1.width / 2;
+                player2.left = x - 100 - player1.width / 2;
+            };
+
+            function recalculatePositions() {
+
+                ball.x = ball.x + ball.velocityX;
+                ball.y = ball.y + ball.velocityY;
+
+                if (ball.y <= player2.height + player2.padding && ball.y
+                        >= player2.height + player2.padding - ball.speed) {
+                    if (ball.x < player2.left + player2.width && ball.x + ball.size > player2.left) {
+                        ball.setAngle(360 - ball.angle);
+                    }
+                }
+
+                if (ball.y >= fieldHeight - player1.height - player1.padding - ball.size
+                        && ball.y <= fieldHeight - player1.height - player1.padding  - ball.size + ball.speed) {
+                    if (ball.x < player1.left + player1.width && ball.x + ball.size > player1.left) {
+                        ball.setAngle(360 - ball.angle);
+                    }
+                }
+
+                if (ball.y <= 0) {
+                    score1++;
+                    goal();
+                }
+
+                if (ball.y >= fieldHeight - ball.size) {
+                    score2++;
+                    goal();
+                }
+
+                if (ball.x <= 0 || ball.x >= fieldWidth - ball.size) {
+                    if (ball.angle >= 0 && ball.angle < 180) {
+                        ball.setAngle(180 - ball.angle);
+                    }
+                    if (ball.angle >= 180 && ball.angle < 360) {
+                        ball.setAngle(270 * 2 - ball.angle);
+                    }
+                }
+                callback(player1.left, player2.left, ball.y, ball.x, score1, score2);
+            }
+
+            var xStart = 100;
+            var xEnd = 500;
+            var ball = new Ball(10, 10, 20, 4, 45);
+            var player1 = new Player(20, 100, 5, (xEnd - xStart - 100) / 2);
+            var player2 = new Player(20, 100, 5, (xEnd - xStart - 100) / 2);
+            var fieldHeight = 500;
+            var fieldWidth = 400;
+            var score1 = 0;
+            var score2 = 0;
+
+            function goal() {
+                ball.x = 30;
+                ball.y = 30;
+                ball.setAngle(45);
+            }
+
+            setInterval(recalculatePositions, 25);
         }
 
     })();
