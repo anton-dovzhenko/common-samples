@@ -17,9 +17,10 @@
     0 - 0
 </div>
 
-<script type="text/javascript" src="jQuery/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="jQuery/jquery-2.0.3.js"></script>
+<script type="text/javascript" src="jQuery/jquery.atmosphere.js"></script>
 
-<scripttype="text/javascript" >
+<script type="text/javascript">
     (function() {
 
         var $field = $('#field');
@@ -28,7 +29,6 @@
         var $player2 = $('#player2');
         var $scoreBoard = $('#scoreBoard');
         var playerPosition = 300;
-        var gameId = null;
 
         function callback(player1Left, player2Left, ballTop, ballLeft, score1, score2) {
             $ball.css('left', ballLeft);
@@ -42,7 +42,38 @@
             playerPosition = event.pageX
         });
 
-        function go(){
+        var socket = $.atmosphere;
+
+        // We are now ready to cut the request
+        var request = {url: 'atmosphere/pingpong/websocket',
+            contentType : "application/json",
+            transport : 'websocket'};
+
+        request.onMessage = function (response) {
+            var message = response.responseBody;
+            console.log("message: " + message);
+            var params = message.split(',');
+            callback(parseInt(params[0]), parseInt(params[1]), parseInt(params[2])
+                    , parseInt(params[3]), parseInt(params[4]), parseInt(params[5]))
+        }
+
+        request.onClose = function(response) {
+            console.log('Closed');
+        };
+
+        request.onError = function(response) {
+            console.log('Error');
+        };
+
+        var subSocket = socket.subscribe(request);
+
+        function go() {
+            console.log(playerPosition)
+            subSocket.push(playerPosition + '');
+        }
+        setInterval(go, 25);
+
+        /*function go(){
             var url = "pingpongasync";
             if (gameId) {
                 url += "?id=" + gameId + "&x=" + playerPosition;
@@ -68,7 +99,7 @@
             };
             request.send(null);
         }
-        go();
+        go();*/
     })();
 </script>
 

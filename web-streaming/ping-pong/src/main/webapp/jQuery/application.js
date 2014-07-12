@@ -1,84 +1,50 @@
-/**
- * Created by Anton on 7/6/2014.
- */
 $(function () {
     "use strict";
 
+    var detect = $('#detect');
+    var header = $('#header');
     var content = $('#content');
-    var input = $('#input');
+    var connect = $('#connect');
     var status = $('#status');
-    var myName = false;
-    var author = null;
-    var logged = false;
-    var socket = $.atmosphere;
-    var request = { url: /*document.location.toString() + */'chat',
-        contentType : "application/json",
-        logLevel : 'debug',
-        transport : 'websocket' ,
-        trackMessageLength : true,
-        fallbackTransport: 'long-polling'};
 
+    var socket = $.atmosphere;
+
+    // We are now ready to cut the request
+    var request = { url: 'atmosphere/pingpong/websocket',
+        contentType : 'application/json',
+        transport : 'websocket'};
+
+    connect.click(function() {
+        console.log("connecting");
+    });
 
     request.onOpen = function(response) {
         content.html($('<p>', { text: 'Atmosphere connected using ' + response.transport }));
-        input.removeAttr('disabled').focus();
-        status.text('Choose name:');
+        status.text('connected');
     };
 
     request.onMessage = function (response) {
         var message = response.responseBody;
         try {
+            console.log("message: " + message);
             var json = jQuery.parseJSON(message);
+            status.html(message);
         } catch (e) {
             console.log('This doesn\'t look like a valid JSON: ', message);
             return;
         }
-
-        input.removeAttr('disabled').focus();
-        if (!logged) {
-            logged = true;
-            status.text(myName + ': ').css('color', 'blue');
-        } else {
-            var me = json.author == author;
-            var date =  typeof(json.time) == 'string' ? parseInt(json.time) : json.time;
-            addMessage(json.author, json.text, me ? 'blue' : 'black', new Date(date));
-        }
     };
 
     request.onClose = function(response) {
-        logged = false;
-    }
+    };
 
     request.onError = function(response) {
         content.html($('<p>', { text: 'Sorry, but there\'s some problem with your '
             + 'socket or the server is down' }));
     };
 
-    var subSocket = socket.subscribe(request);
+    // Connect to the server, hook up to the request handler.
+    socket.subscribe(request);
 
-    input.keydown(function(e) {
-        if (e.keyCode === 13) {
-            var msg = $(this).val();
-
-            // First message is always the author's name
-            if (author == null) {
-                author = msg;
-            }
-
-            subSocket.push(jQuery.stringifyJSON({ author: author, message: msg }));
-            $(this).val('');
-
-            input.attr('disabled', 'disabled');
-            if (myName === false) {
-                myName = msg;
-            }
-        }
-    });
-
-    function addMessage(author, message, color, datetime) {
-        content.append('<p><span style="color:' + color + '">' + author + '</span> @ ' +
-            + (datetime.getHours() < 10 ? '0' + datetime.getHours() : datetime.getHours()) + ':'
-            + (datetime.getMinutes() < 10 ? '0' + datetime.getMinutes() : datetime.getMinutes())
-            + ': ' + message + '</p>');
-    }
 });
+
