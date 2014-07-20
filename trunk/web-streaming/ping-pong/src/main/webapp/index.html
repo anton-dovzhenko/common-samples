@@ -60,7 +60,8 @@
             this.width = width;
             this.padding = padding;
             this.left = left;
-
+            this.previousLeft = left;
+            this.speed = 0;
         }
 
         function PingPongJsController(callback) {
@@ -71,6 +72,11 @@
             };
 
             function recalculatePositions() {
+
+                player1.speed = player1.left - player1.previousLeft;
+                player2.speed = player2.left - player2.previousLeft;
+                player1.previousLeft = player1.left;
+                player2.previousLeft = player2.left;
 
                 ball.x = ball.x + ball.velocityX;
                 ball.y = ball.y + ball.velocityY;
@@ -85,7 +91,7 @@
                 if (ball.y >= fieldHeight - player1.height - player1.padding - ball.size
                         && ball.y <= fieldHeight - player1.height - player1.padding  - ball.size + ball.speed) {
                     if (ball.x < player1.left + player1.width && ball.x + ball.size > player1.left) {
-                        ball.setAngle(360 - ball.angle);
+                        ball.setAngle(360 - ball.angle + player1.speed / ball.speed * 20);
                     }
                 }
 
@@ -112,7 +118,7 @@
 
             var xStart = 100;
             var xEnd = 500;
-            var ball = new Ball(10, 10, 20, 4, 45);
+            var ball = new Ball(190, 240, 20, 4, getStartingAngle());
             var player1 = new Player(20, 100, 5, (xEnd - xStart - 100) / 2);
             var player2 = new Player(20, 100, 5, (xEnd - xStart - 100) / 2);
             var fieldHeight = 500;
@@ -121,9 +127,16 @@
             var score2 = 0;
 
             function goal() {
-                ball.x = 30;
-                ball.y = 30;
-                ball.setAngle(45);
+                ball = new Ball(190, 240, 20, 4, getStartingAngle());
+            }
+
+            function getStartingAngle() {
+                var random = Math.random();
+                if (random <= 0.5) {
+                    return 45 + 180 * random;
+                } else {
+                    return 225 + 180 * (1 - random);
+                }
             }
 
             setInterval(recalculatePositions, 25);
