@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+
+<div style="float: left; width: 50%;" id="date"></div>
+<div style="float: right; width: 50%;" id="time"></div>
+
+<br><br>
+<button onclick="start()">Start</button>
+
+<script type="text/javascript">
+    function start() {
+        var source = new EventSource('test');
+        source.addEventListener('date', function(e) {
+            console.log(event.data);
+            document.getElementById('date').innerHTML = event.data + '<br/>' + document.getElementById('date').innerHTML;
+        }, false);
+        source.addEventListener('time', function(e) {
+            console.log(event.data);
+            document.getElementById('time').innerHTML = event.data + '<br/>' + document.getElementById('time').innerHTML;
+        }, false);
+    }
+</script>
+
+</body>
+</html>
