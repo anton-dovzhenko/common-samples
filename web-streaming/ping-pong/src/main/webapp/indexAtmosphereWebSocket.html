@@ -51,7 +51,6 @@
 
         request.onMessage = function (response) {
             var message = response.responseBody;
-            console.log("message: " + message);
             var params = message.split(',');
             callback(parseInt(params[0]), parseInt(params[1]), parseInt(params[2])
                     , parseInt(params[3]), parseInt(params[4]), parseInt(params[5]))
@@ -68,38 +67,9 @@
         var subSocket = socket.subscribe(request);
 
         function go() {
-            console.log(playerPosition)
             subSocket.push(playerPosition + '');
         }
         setInterval(go, 25);
-
-        /*function go(){
-            var url = "pingpongasync";
-            if (gameId) {
-                url += "?id=" + gameId + "&x=" + playerPosition;
-            }
-            var request =  new XMLHttpRequest();
-            request.open("GET", url, true);
-            request.setRequestHeader("Content-Type", "application/x-javascript;");
-            request.onreadystatechange = function() {
-                if (request.readyState == 4) {
-                    if (request.status == 200){
-                        if (request.responseText) {
-                            if (!gameId) {
-                                gameId = request.responseText;
-                            } else {
-                                var params = request.responseText.split(',');
-                                callback(parseInt(params[0]), parseInt(params[1]), parseInt(params[2])
-                                        , parseInt(params[3]), parseInt(params[4]), parseInt(params[5]))
-                            }
-                        }
-                    }
-                    go();
-                }
-            };
-            request.send(null);
-        }
-        go();*/
     })();
 </script>
 
