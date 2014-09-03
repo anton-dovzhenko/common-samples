@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script type ="text/javascript" src="activity-viewer/js/atmosphere-min.js"></script>
+</head>
+<body>
+<script type ="text/javascript">
+
+    (function () {
+        'use strict';
+
+        var socket = atmosphere;
+        var transport = 'websocket';
+
+        // We are now ready to cut the request
+        var request = { url: '/atmosphere/quote',
+            contentType : 'application/json',
+            transport : transport
+            //trackMessageLength : true,
+            //reconnectInterval : 5000,
+            //enableXDR: true,
+            //timeout : 60000
+        };
+
+        request.onOpen = function(response) {
+            transport = response.transport;
+            request.uuid = response.request.uuid;
+            console.log('Transport: '+ transport);
+            console.log('UUID: '+ response.request.uuid);
+        };
+
+        request.onClientTimeout = function(r) {
+            console.log('ClientTimeout');
+            setTimeout(function () {
+                subSocket = socket.subscribe(request);
+            }, request.reconnectInterval);
+        }
+
+        request.onMessage = function (response) {
+            console.log('Message:' + response.responseBody);
+        }
+
+        request.onClose = function(response) {
+            console.log('Close');
+        }
+
+        request.onError = function(response) {
+            console.log('Error');
+        }
+
+        var subSocket = socket.subscribe(request);
+
+    })();
+
+</script>
+</body>
+</html>

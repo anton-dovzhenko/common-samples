@@ -23,7 +23,7 @@ Ext.application({
         var quoteStore = Ext.create('Ext.data.Store', {
             model: 'Quote'
             , storeId: 'Quote'
-            , autoLoad: 'true'
+            , clearOnPageLoad: false
             , proxy: {
                 type: 'ajax',
                 url: 'rest/quotes.do',
@@ -42,7 +42,8 @@ Ext.application({
                 , {text: 'Currency Pair', width: 100, dataIndex: 'ccyPair', sortable: true}
                 , {text: 'Direction', width: 90, dataIndex: 'direction', sortable: true}
                 , {text: 'Price', width: 120, dataIndex: 'price', sortable: true, align: 'right', style: 'text-align: left'}
-                , {text: 'Base ccy amount', width: 150, dataIndex: 'amount', sortable: true, xtype: 'numbercolumn', format:'0,000', align: 'right', style: 'text-align: left'}
+                , {text: 'Base ccy amount', width: 150, dataIndex: 'amount', sortable: true, xtype: 'numbercolumn'
+                    , format:'0,000', align: 'right', style: 'text-align: left'}
                 , {text: 'Requester id',  width: 120, dataIndex: 'requesterId', sortable: true, align: 'right', style: 'text-align: left'}
             ]
             , forceFit: true
@@ -70,6 +71,56 @@ Ext.application({
                 }
             ]
         });
+
+        //***********************************
+        //*** Atmosphere integration part ***
+        //***********************************
+
+        var socket = atmosphere;
+        var transport = 'websocket';
+
+        // We are now ready to cut the request
+        var request = { url: '/atmosphere/quote',
+            contentType : 'application/json',
+            transport : 'websocket'
+        };
+
+        request.onOpen = function(response) {
+            transport = response.transport;
+            request.uuid = response.request.uuid;
+            quoteStore.load();
+            console.log('Transport: '+ transport);
+            console.log('UUID: '+ response.request.uuid);
+        };
+
+        request.onClientTimeout = function(r) {
+            console.log('ClientTimeout');
+            setTimeout(function () {
+                subSocket = socket.subscribe(request);
+            }, request.reconnectInterval);
+        }
+
+        request.onMessage = function (response) {
+            var quotes = JSON.parse(response.responseBody);
+            var quoteCount = quotes.length;
+            for (var i = 0; i < quoteCount; i++) {
+                var quote = quotes[i];
+                console.log('Message:' + quote);
+                quoteStore.insert(0, quote);
+                var record = quoteStore.getById(quote.id);
+                Ext.get(quoteGrid.getView().getNode(record)).highlight("FFFF33", {attr: 'backgroundColor', duration: 2000});
+            }
+        }
+
+        request.onClose = function(response) {
+            console.log('Close');
+        }
+
+        request.onError = function(response) {
+            console.log('Error');
+        }
+
+        var subSocket = socket.subscribe(request);
 
     }
 });
