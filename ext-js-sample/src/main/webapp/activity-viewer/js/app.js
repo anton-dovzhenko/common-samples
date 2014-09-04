@@ -64,7 +64,6 @@ Ext.application({
             var quoteCount = quotes.length;
             for (var i = 0; i < quoteCount; i++) {
                 var quote = quotes[i];
-                console.log('Message:' + quote);
                 quoteStore.insert(0, quote);
                 var record = quoteStore.getById(quote.id);
                 Ext.get(quoteGrid.getView().getNode(record)).highlight("FFFF33", {attr: 'backgroundColor', duration: 2000});
