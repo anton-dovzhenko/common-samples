@@ -1,15 +1,25 @@
 Ext.define('LiveGridApp.controller.Quote', {
     extend: 'Ext.app.Controller'
-    , requires: ['LiveGridApp.view.QuoteGrid']
-    //, views:  ['QuoteGrid']
+    , refs: [
+        {
+            ref: 'quoteGrid'
+            //, selector: ''
+            , xtype: 'quotegrid'
+            //, autoCreate: true
+        }
+    ]
     , models: ['Quote']
+    , stores: ['Quotes']
 
     , init: function() {
         var quoteGrid = this.getQuoteGrid();
         var quoteStore = this.getQuotesStore();
 
+        console.log('--------------');
+        console.log(quoteGrid);
         console.log(Ext.getClassName(quoteGrid));
         console.log(Ext.getClassName(quoteStore));
+        console.log('--------------');
 
         for (var m in quoteGrid) {
             if (typeof quoteGrid[m] == "function") {
@@ -47,7 +57,13 @@ Ext.define('LiveGridApp.controller.Quote', {
             for (var i = 0; i < quoteCount; i++) {
                 var quote = quotes[i];
                 quoteStore.insert(0, quote);
-                quoteGrid.highlightRow(quote.id)
+
+                //var record = quoteStore.getById(quote.id);
+                //console.log(record);
+                //console.log(quoteGrid.getView().getNode(record));
+                //Ext.get(quoteGrid.getView().getNode(record)).highlight("FFFF33", {attr: 'backgroundColor', duration: 2000});
+
+                //quoteGrid.highlightRow(quote.id)
             }
         }
 

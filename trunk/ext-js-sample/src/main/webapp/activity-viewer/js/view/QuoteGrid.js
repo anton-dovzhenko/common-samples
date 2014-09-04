@@ -20,6 +20,8 @@ Ext.define('LiveGridApp.view.QuoteGrid', {
 
     , highlightRow: function(id) {
         var record = this.store.getById(id);
+        console.log(record);
+        console.log(this.getView().getNode(record));
         Ext.get(this.getView().getNode(record)).highlight("FFFF33", {attr: 'backgroundColor', duration: 2000});
     }
 });
