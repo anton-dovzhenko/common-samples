@@ -1,5 +1,7 @@
 Ext.define('LiveGridApp.view.QuoteGrid', {
     extend: 'Ext.grid.Panel'
+    , alias: 'widget.quotegrid'
+    , store:'Quotes'
     , columns: [
         {text: 'Id', width: 50, dataIndex: 'id', sortable: true, align: 'right', style: 'text-align: left'}
         , {text: 'Version', width: 90, dataIndex: 'version', sortable: true, align: 'right', style: 'text-align: left'}
@@ -15,4 +17,9 @@ Ext.define('LiveGridApp.view.QuoteGrid', {
     ]
     , forceFit: true
     , split: true
+
+    , highlightRow: function(id) {
+        var record = this.store.getById(id);
+        Ext.get(this.getView().getNode(record)).highlight("FFFF33", {attr: 'backgroundColor', duration: 2000});
+    }
 });
