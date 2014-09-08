@@ -8,5 +8,6 @@ Ext.define('LiveGridApp.store.Quotes', {
         url: 'rest/quotes.do',
         reader: {type: 'json', root: 'quotes'}
     }
-    //, autoLoad: true
+    , sortOnLoad: true
+    , sorters: {property: 'id', direction : 'DESC'}
 });
