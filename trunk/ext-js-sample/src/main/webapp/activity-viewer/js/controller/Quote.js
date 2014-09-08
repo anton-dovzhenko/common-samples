@@ -31,7 +31,7 @@ Ext.define('LiveGridApp.controller.Quote', {
         var transport = 'websocket';
 
         // We are now ready to cut the request
-        var request = { url: '/atmosphere/quote',
+        var request = { url: 'atmosphere/quote',
             contentType : 'application/json',
             transport : 'websocket'
         };
@@ -54,16 +54,19 @@ Ext.define('LiveGridApp.controller.Quote', {
         request.onMessage = function (response) {
             var quotes = JSON.parse(response.responseBody);
             var quoteCount = quotes.length;
+            var ids = [];
             for (var i = 0; i < quoteCount; i++) {
                 var quote = quotes[i];
-                quoteStore.insert(0, quote);
-
-                //var record = quoteStore.getById(quote.id);
-                //console.log(record);
-                //console.log(quoteGrid.getView().getNode(record));
-                //Ext.get(quoteGrid.getView().getNode(record)).highlight("FFFF33", {attr: 'backgroundColor', duration: 2000});
-
-                //quoteGrid.highlightRow(quote.id)
+                quoteStore.add(quote);
+                ids.push(quote.id);
+            }
+            for (var i = 0; i < ids.length; i++) {
+                var record = quoteStore.getById(ids[i]);
+                var idx = quoteStore.indexOf(record);
+                var row = quoteGrid.getView().getRow(idx);
+                if (row != null) {
+                    Ext.fly(row).highlight("FFFF33", {attr: 'backgroundColor', duration: 2000, alternate: true});
+                }
             }
         }
 
