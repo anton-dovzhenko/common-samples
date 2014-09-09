@@ -1,19 +1,25 @@
 package com.gammadevs.quoteviewer.service;
 
-import com.gammadevs.quoteviewer.model.Direction;
-import com.gammadevs.quoteviewer.model.Quote;
-import com.gammadevs.quoteviewer.model.Status;
-import com.sun.istack.internal.logging.Logger;
-import org.atmosphere.cpr.Broadcaster;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.annotation.PostConstruct;
+
 import org.atmosphere.cpr.BroadcasterFactory;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.logging.Level;
+import com.gammadevs.quoteviewer.model.Direction;
+import com.gammadevs.quoteviewer.model.Quote;
+import com.gammadevs.quoteviewer.model.Status;
 
 /**
  * Created by Anton on 9/1/2014.
@@ -21,7 +27,7 @@ import java.util.logging.Level;
 @Service("quoteService")
 public class QuoteServiceImpl implements QuoteService {
 
-    private final static Logger logger = Logger.getLogger(QuoteServiceImpl.class);
+    private final static Logger logger = Logger.getLogger(QuoteServiceImpl.class.getName());
 
     private final String[] ccyPairs = new String[] {"EURUSD", "USDJPY", "AUDUSD", "NOKUSD", "SEKUSD"};
     private final double[] rates = new double[] {1.3575, 104.28, 0.92, 0.16, 0.14};
@@ -32,7 +38,8 @@ public class QuoteServiceImpl implements QuoteService {
     private Thread updateThread;
 
 
-    @PostConstruct
+    @SuppressWarnings("deprecation")
+	@PostConstruct
     private void init() {
         quotes = new LinkedHashMap<Long, Quote>();
         quotes.put(++lastQuoteId, new Quote(lastQuoteId, 1, new Date(114, 1, 1, 0, 30, 0), new Date(114, 1, 1, 0, 30, 0)
@@ -53,7 +60,7 @@ public class QuoteServiceImpl implements QuoteService {
         updateThread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
-                logger.logException(e, Level.SEVERE);
+                logger.log(Level.SEVERE, "", e);
             }
         });
         updateThread.start();
@@ -103,7 +110,8 @@ public class QuoteServiceImpl implements QuoteService {
 
     private class QuoteUpdateRunnable implements Runnable {
 
-        @Override
+        @SuppressWarnings("deprecation")
+		@Override
         public void run() {
             while (true) {
                 try {

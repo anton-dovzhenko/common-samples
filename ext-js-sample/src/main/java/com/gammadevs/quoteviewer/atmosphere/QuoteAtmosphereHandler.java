@@ -1,21 +1,22 @@
 package com.gammadevs.quoteviewer.atmosphere;
 
-import com.sun.istack.internal.logging.Logger;
-import org.atmosphere.config.service.AtmosphereHandlerService;
-import org.atmosphere.cpr.*;
-import org.atmosphere.interceptor.AtmosphereResourceLifecycleInterceptor;
-
 import java.io.IOException;
+import java.util.logging.Logger;
+
+import org.atmosphere.config.service.AtmosphereHandlerService;
+import org.atmosphere.cpr.AtmosphereHandler;
+import org.atmosphere.cpr.AtmosphereRequest;
+import org.atmosphere.cpr.AtmosphereResource;
+import org.atmosphere.cpr.AtmosphereResourceEvent;
+import org.atmosphere.cpr.AtmosphereResponse;
 
 /**
  * Created by Anton on 9/1/2014.
  */
-@AtmosphereHandlerService(
-        path="/atmosphere/quote"
-)
+@AtmosphereHandlerService(path="/atmosphere/quote")
 public class QuoteAtmosphereHandler implements AtmosphereHandler {
 
-    private final static Logger logger = Logger.getLogger(QuoteAtmosphereHandler.class);
+    private final static Logger logger = Logger.getLogger(QuoteAtmosphereHandler.class.getName());
 
     @Override
     public void onRequest(AtmosphereResource resource) throws IOException {
