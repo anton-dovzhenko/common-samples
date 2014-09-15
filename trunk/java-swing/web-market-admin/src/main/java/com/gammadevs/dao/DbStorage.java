@@ -13,6 +13,7 @@ public class DbStorage {
 
     private final static DbStorage instance = new DbStorage();
     private final Map<Long, Producer> producers = new HashMap<Long, Producer>();
+    private Long uniqueIndex = 0L;
 
     private DbStorage() {
         init();
@@ -23,11 +24,18 @@ public class DbStorage {
     }
 
     private void init() {
-        producers.put(1L, new Producer(1L, "Producer1"));
-        producers.put(2L, new Producer(2L, "Producer2"));
-        producers.put(3L, new Producer(3L, "Producer3"));
-        producers.put(4L, new Producer(4L, "Producer4"));
-        producers.put(5L, new Producer(5L, "Producer5"));
+        producers.put(++uniqueIndex, new Producer(uniqueIndex, "Producer1"));
+        producers.put(++uniqueIndex, new Producer(uniqueIndex, "Producer2"));
+        producers.put(++uniqueIndex, new Producer(uniqueIndex, "Producer3"));
+        producers.put(++uniqueIndex, new Producer(uniqueIndex, "Producer4"));
+        producers.put(++uniqueIndex, new Producer(uniqueIndex, "Producer5"));
+    }
+
+    public Producer saveOrUpdate(Producer producer) {
+        Producer item = producer.getId() != null
+                ? producer : new Producer(++uniqueIndex, producer.getName());
+        producers.put(item.getId(), item);
+        return item;
     }
 
     public Collection<Producer> getProducers() {
