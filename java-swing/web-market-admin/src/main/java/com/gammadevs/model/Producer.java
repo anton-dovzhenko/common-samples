@@ -5,27 +5,20 @@ package com.gammadevs.model;
  */
 public class Producer {
 
-    private long id;
-    private String name;
+    private final Long id;
+    private final String name;
 
-    public Producer(long id, String name) {
+    public Producer(Long id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
 }

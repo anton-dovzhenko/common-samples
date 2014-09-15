@@ -1,28 +1,34 @@
 package com.gammadevs.gui.producer;
 
+import com.gammadevs.model.Producer;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * Created by Anton on 9/14/2014.
  */
-public class AddProducerPanel extends JPanel {
+public class AddOrUpdateProducerPanel extends JPanel {
 
     private JTextField idTextField;
     private JTextField nameTextField;
     private JButton cancelButton;
     private JButton saveButton;
 
-    public AddProducerPanel() {
+    private Producer producer;
+
+    public AddOrUpdateProducerPanel() {
         super(new GridBagLayout());
         createUi();
+        initListeners();
     }
 
     private void createUi() {
-
         idTextField = new JTextField();
         idTextField.setEnabled(false);
-        idTextField.setText("none");
+        idTextField.setText("");
         nameTextField = new JTextField();
         cancelButton = new JButton("Cancel");
         cancelButton.setPreferredSize(new Dimension(75, 20));
@@ -67,15 +73,15 @@ public class AddProducerPanel extends JPanel {
         c.gridwidth = 3;
         this.add(nameTextField, c);
 
-        c.weightx = 0.1;
+        c.weightx = 1;
         c.gridx = 2;
         c.gridy = 2;
-        c.fill = GridBagConstraints.EAST;
+        c.fill = GridBagConstraints.WEST;
         c.insets = new Insets(0, 20, 0, 20);
         c.gridwidth = 1;
         this.add(cancelButton, c);
 
-        c.weightx = 0.1;
+        c.weightx = 1;
         c.gridx = 3;
         c.gridy = 2;
         c.fill = GridBagConstraints.EAST;
@@ -83,5 +89,47 @@ public class AddProducerPanel extends JPanel {
         c.gridwidth = 1;
         this.add(saveButton, c);
 
+        c.weightx = 1;
+        c.gridx = 3;
+        c.gridy = 3;
+        c.fill = GridBagConstraints.EAST;
+        c.insets = new Insets(0, 20, 0, 20);
+        c.gridwidth = 1;
     }
+
+    private void initListeners() {
+        cancelButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                clear();
+            }
+        });
+    }
+
+    void addSaveBtnListener(ActionListener listener) {
+        saveButton.addActionListener(listener);
+    }
+
+    //TODO: implement error logic and add error Label.
+    void setErrorMessage(String text) {
+
+    }
+
+    void setProducer(Producer producer) {
+        this.producer = producer;
+        idTextField.setText(producer.getId().toString());
+        nameTextField.setText(producer.getName());
+    }
+
+    void clear() {
+        producer = null;
+        idTextField.setText("");
+        nameTextField.setText("");
+    }
+
+    Producer getProducer() {
+        return new Producer(producer != null ? producer.getId() : null
+                , nameTextField.getText());
+    }
+
 }
