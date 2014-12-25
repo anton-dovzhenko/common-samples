@@ -1,6 +1,8 @@
 Ext.define('LiveGridApp.view.QuoteGrid', {
     extend: 'Ext.grid.Panel'
+    , requires: ['LiveGridApp.view.QuoteGridToolbar']
     , alias: 'widget.quotegrid'
+    , tbar: {xtype : 'quotegridtoolbar'}
     , store:'Quotes'
     , columns: [
         {text: 'Id', width: 50, dataIndex: 'id', sortable: true, align: 'right', style: 'text-align: left'}

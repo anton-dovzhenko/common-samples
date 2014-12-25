@@ -1,6 +1,6 @@
 Ext.define('LiveGridApp.view.Viewport', {
     extend: 'Ext.container.Viewport'
-    , requires: ['LiveGridApp.view.QuoteGrid']
+    , requires: ['LiveGridApp.view.QuoteGridToolbar', 'LiveGridApp.view.QuoteGrid']
     , layout: 'border'
     , initComponent: function() {
         this.items = {
