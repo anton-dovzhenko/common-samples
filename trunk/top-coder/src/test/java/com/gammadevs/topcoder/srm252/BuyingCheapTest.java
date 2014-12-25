@@ -1,6 +1,5 @@
 package com.gammadevs.topcoder.srm252;
 
-import junit.framework.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
