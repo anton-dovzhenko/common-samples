@@ -118,7 +118,7 @@
 
             var xStart = 100;
             var xEnd = 500;
-            var ball = new Ball(190, 240, 20, 4, getStartingAngle());
+            var ball = new Ball(190, 240, 20, 8, getStartingAngle());
             var player1 = new Player(20, 100, 5, (xEnd - xStart - 100) / 2);
             var player2 = new Player(20, 100, 5, (xEnd - xStart - 100) / 2);
             var fieldHeight = 500;
@@ -127,7 +127,7 @@
             var score2 = 0;
 
             function goal() {
-                ball = new Ball(190, 240, 20, 4, getStartingAngle());
+                ball = new Ball(190, 240, 20, 8, getStartingAngle());
             }
 
             function getStartingAngle() {
@@ -139,7 +139,7 @@
                 }
             }
 
-            setInterval(recalculatePositions, 25);
+            setInterval(recalculatePositions, 1);
         }
 
     })();
