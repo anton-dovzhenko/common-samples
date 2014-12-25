@@ -15,17 +15,24 @@ Ext.define('LiveGridApp.controller.Quote', {
         var quoteGrid = this.getQuoteGrid();
         var quoteStore = this.getQuotesStore();
 
-        console.log('--------------');
+        var obj = this;
+        for(var m in obj) {
+            if(typeof obj[m] == "function") {
+                console.log(m)
+            }
+        }
+
+        /*console.log('--------------');
         console.log(quoteGrid);
         console.log(Ext.getClassName(quoteGrid));
         console.log(Ext.getClassName(quoteStore));
-        console.log('--------------');
+        console.log('--------------');*/
 
-        for (var m in quoteGrid) {
+        /*for (var m in quoteGrid) {
             if (typeof quoteGrid[m] == "function") {
                 console.log(m);
             }
-        }
+        }*/
 
         var socket = atmosphere;
         var transport = 'websocket';

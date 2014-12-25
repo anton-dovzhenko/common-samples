@@ -1,6 +1,8 @@
 package com.gammadevs.quoteviewer.model;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -39,6 +41,22 @@ public class Quote {
         this.price = price;
         this.amount = amount;
         this.requesterId = requesterId;
+
+
+        Date now = new Date(); //assuming it's new day and correct
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(now);
+        calendar.add(Calendar.DATE, -1);
+
+        calendar.set(Calendar.HOUR, 8);
+        calendar.set(Calendar.MINUTE, 30);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 30);
+        Timestamp from = new Timestamp(calendar.getTime().getTime());
+
+        calendar.set(Calendar.HOUR, 18);
+        Timestamp to = new Timestamp(calendar.getTime().getTime());
+
     }
 
     public Long getId() {
