@@ -1,0 +1,40 @@
+body {
+    font: 12px Arial;
+}
+path {
+    stroke: steelblue;
+    stroke-width: 2;
+    fill: none;
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: grey;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+}
+.axis .minor line {
+    stroke: lightgrey;
+    opacity: 0.7;
+    stroke-dasharray: 2,2;
+}
+.tooltip {
+    display: none;
+    padding: 3px;
+    position: absolute;
+    background-color: rgba(192,192,192,0.8);
+    height: 70px;
+    width: 85px;
+}
+
+.line {
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 1.5px;
+}
+.brush .extent {
+    stroke: #fff;
+    fill-opacity: .125;
+    shape-rendering: crispEdges;
+}

@@ -3,36 +3,7 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title>Simple D3 Dev Env</title>
-    <style>
-        body { font: 12px Arial;}
-
-        path {
-            stroke: steelblue;
-            stroke-width: 2;
-            fill: none;
-        }
-
-        .axis path,
-        .axis line {
-            fill: none;
-            stroke: grey;
-            stroke-width: 1;
-            shape-rendering: crispEdges;
-        }
-        .axis .minor line {
-            stroke: lightgrey;
-            opacity: 0.7;
-            stroke-dasharray: 2,2;
-        }
-        .tooltip {
-            display: none;
-            padding: 3px;
-            position: absolute;
-            background-color: rgba(192,192,192,0.8);
-            height: 70px;
-            width: 85px;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="candlestick.css"/>
 </head>
 <body>
 <svg id="chart"></svg>
@@ -43,95 +14,164 @@
         var instance = {};
 
         instance.render = function(data) {
-            var svg = d3.select(spec.element);
-            svg.attr('height', spec.height + spec.margin.top + spec.margin.bottom);
-            svg.attr('width', spec.width + spec.margin.left + spec.margin.right);
 
-
-            var div = d3.select('body')
-                    .append('div')
-                    .attr('class', 'tooltip');
+            var candleTimeInMs = getCandleTimeInMs(data);
+            var totalHeight = spec.height + spec.margin.top + spec.margin.bottom
+                    + spec.margin.top2 + spec.margin.bottom2;
+            var totalWidth = spec.width + spec.margin.left + spec.margin.right;
+            var mainChartHeight = spec.height * 0.8;
+            var focusChartHeight = spec.height * 0.2;
 
             var yMin = d3.min(data, function(d) {return d['LOW'];});
             var yMax = d3.max(data, function(d) {return d['HIGH'];});
             var xMin = d3.min(data, function(d) {return d['Time'];});
             var xMax = d3.max(data, function(d) {return d['Time'];});
-            xMax = new Date(xMax);
-            //FIXME: implement flexible interval incrementation
-            xMax.setHours(xMax.getHours() + 1);
+            xMax = new Date(xMax.getTime() + candleTimeInMs);
 
             var xScale = d3.time.scale().range([0, spec.width]).domain([xMin, xMax]);
-            var yScale = d3.scale.linear().range([spec.height, 0]).domain([yMin, yMax]);
+            var yScale = d3.scale.linear().range([mainChartHeight, 0]).domain([yMin, yMax]);
+            var xFocusScale = d3.time.scale().range([0, spec.width]).domain([xMin, xMax]);
+            var yFocusScale = d3.scale.linear().range([focusChartHeight, 0]).domain([yMin, yMax]);
 
             var xAxis = d3.svg.axis().scale(xScale).orient('bottom').ticks(5)
-                    .tickFormat(d3.time.format(spec.xAxisFormat)).tickSize(-spec.height);
+                    .tickFormat(d3.time.format(spec.xAxisFormat)).tickSize(-mainChartHeight);
             var yAxis = d3.svg.axis().scale(yScale).orient('left').ticks(5)
                     .tickFormat(d3.format(spec.yAxisFormat)).tickSize(-spec.width);
+            var xFocusAxis = d3.svg.axis().scale(xFocusScale).orient('bottom').ticks(5)
+                    .tickFormat(d3.time.format(spec.xAxisFormat));
+            var yFocusAxis = d3.svg.axis().scale(yFocusScale).orient('left').ticks(2)
+                    .tickFormat(d3.format(spec.yAxisFormat)).tickSize(-spec.width);
 
-            var xWidth = (xScale(xMax) - xScale(xMin)) / data.length;
+            var svg = d3.select(spec.element).attr('height', totalHeight).attr('width', totalWidth);
 
-            //creating Axes
-            var gy = svg.append('g')
-                    .attr('class', 'y axis')
-                    .attr('transform', 'translate(' + spec.margin.left + ', ' + spec.margin.top + ')')
-                    .style('fill', 'steelblue')
-                    .call(yAxis);
-            gy.selectAll('g').filter(function(d) { return d; })
-                    .classed("minor", true);
+            var brush = d3.svg.brush().x(xFocusScale)
+                    .extent([xMin, xMax])
+                    .on('brush', brushed);
 
-            var gx = svg.append('g')
-                    .attr('class', 'x axis')
-                    .attr('transform', 'translate(' + spec.margin.left  + ', ' + (spec.height + spec.margin.top) + ')')
-                    .style('fill', 'steelblue')
-                    .call(xAxis);
-            gx.selectAll("g").filter(function(d) { return d; })
-                    .classed("minor", true);
+            var div = d3.select('body').append('div').attr('class', 'tooltip');
 
             //Creating candlesticks
             var chartContainer = svg.append('g')
                     .attr('transform', 'translate(' + spec.margin.left + ', ' + spec.margin.top + ')');
-            var g = chartContainer.selectAll('g').data(data).enter()
-                    .append('g')
-                    .attr('transform', function(d) {return 'translate(' + xScale(d['Time']) + ', ' + yScale(d['HIGH'])+ ')'})
-                    .attr('style', function(d) {return getCandleGroupStyle(d)});
-            g.append('rect')
-                    .attr('x', 0)
-                    .attr('y', function(d) {return Math.min(yScale(d['FIRST']), yScale(d['LAST'])) - yScale(d['HIGH']);})
-                    .attr('width', xWidth)
-                    .attr('height', function(d) {
-                        return Math.abs(yScale(d['FIRST']) - yScale(d['LAST']));
-                    })
-                    .attr('style', 'stroke:white;stroke-width:2;');
+            createCandlesticks();
 
-            g.append('line')
-                    .attr('x1', xWidth / 2)
-                    .attr('x2', xWidth / 2)
-                    .attr('y1', 0)
-                    .attr('y2', function(d) {return - yScale(d['HIGH']) + yScale(d['LOW']);})
-                    .attr('stroke-width', 2);
 
-            g.on('mouseover', function(d) {
-                console.log(d3.select(this).attr('transform'));
-                var candle = d3.select(this);
-                candle.attr('style', 'fill:' + spec.highlightColor + ';stroke:' + spec.highlightColor + ';');
-                var candleX = d3.transform(candle.attr('transform')).translate[0];
-                var candleY = d3.transform(candle.attr('transform')).translate[1];
-                div.style('display', 'block');
-                if (candleX < 85) {
-                    var left = (candleX + spec.margin.left + xWidth + 10);
-                } else {
-                    left = (candleX + spec.margin.left - 95);
-                }
-                div.style('left', left + 'px');
-                div.style('top', (candleY + spec.margin.top) + 'px');
-                div.html(d3.time.format(spec.xAxisFormat)(d['Time'])
-                        + '<br/>High: ' + d['HIGH'] + '<br/>Low: ' + d['LOW']
-                        + '<br/>First: ' + d['FIRST'] + '<br/>Last: ' + d['LAST']);
-            });
-            g.on('mouseout', function(d) {
-                d3.select(this).attr('style', getCandleGroupStyle(d));
-                div.style('display', 'none');
-            });
+
+            var gy = chartContainer.append('g')
+                    .attr('class', 'y axis')
+                    .attr('transform', 'translate(0, 0)')
+                    .style('fill', 'steelblue')
+                    .call(yAxis);
+            gy.selectAll('g').filter(function(d) { return d; })
+                    .classed('minor', true);
+
+            var gx = chartContainer.append('g')
+                    .attr('class', 'x axis')
+                    .attr('transform', 'translate(' + 0  + ', ' + (mainChartHeight) + ')')
+                    .style('fill', 'steelblue')
+                    .call(xAxis);
+            gx.selectAll('g').filter(function(d) { return d; })
+                    .classed('minor', true);
+
+            //Create Focus Chart
+            var chartFocusContainer = svg.append('g')
+                    .attr('transform', 'translate(' + spec.margin.left + ', '
+                            + (spec.margin.top + spec.margin.bottom + mainChartHeight) + ')');
+            var line = d3.svg.line()
+                    .x(function(d) { return xFocusScale(new Date(d['Time'].getTime() + candleTimeInMs/2)); })
+                    .y(function(d) { return yFocusScale((d['HIGH'] + d['LOW']) / 2 ); });
+            chartFocusContainer.append('path')
+                    .datum(data)
+                    .attr('class', 'line')
+                    .attr('d', line);
+            var gfy = chartFocusContainer.append('g')
+                    .attr('class', 'y axis')
+                    .style('fill', 'steelblue')
+                    .call(yFocusAxis);
+            gfy.selectAll('g').filter(function(d) { return d; })
+                    .classed('minor', true);
+
+            var gfx = chartFocusContainer.append('g')
+                    .attr('class', 'x axis')
+                    .attr('transform', 'translate(0, ' + focusChartHeight + ')')
+                    .style('fill', 'steelblue')
+                    .call(xFocusAxis);
+            gfx.selectAll('g').filter(function(d) { return d; })
+                    .classed('minor', true);
+
+            //debugger;
+            chartFocusContainer.append('g')
+                    .attr('class', 'x brush')
+                    .call(brush)
+                    .selectAll('rect')
+                    .attr('y', -6)
+                    .attr('height', focusChartHeight + 7);
+
+            function createCandlesticks() {
+                var xWidth = spec.width / (xScale.domain()[1] - xScale.domain()[0]) * candleTimeInMs;
+                //var xWidth = (xScale(xMax) - xScale(xMin)) / data.length;
+
+                var g = chartContainer.selectAll('g').data(data).enter()
+                        .append('g')
+                        .attr('class', 'candlestick')
+                        .attr('transform', function(d) {return 'translate(' + xScale(d['Time']) + ', ' + yScale(d['HIGH'])+ ')'})
+                        .attr('style', function(d) {return getCandleGroupStyle(d)});
+                g.append('rect')
+                        .attr('x', 0)
+                        .attr('y', function(d) {return Math.min(yScale(d['FIRST']), yScale(d['LAST'])) - yScale(d['HIGH']);})
+                        .attr('width', xWidth)
+                        .attr('height', function(d) {
+                            return Math.abs(yScale(d['FIRST']) - yScale(d['LAST']));
+                        })
+                        .attr('style', 'stroke:white;stroke-width:2;');
+
+                g.append('line')
+                        .attr('x1', xWidth / 2)
+                        .attr('x2', xWidth / 2)
+                        .attr('y1', 0)
+                        .attr('y2', function(d) {return - yScale(d['HIGH']) + yScale(d['LOW']);})
+                        .attr('stroke-width', 2);
+                g.on('mouseover', function(d) {
+                    var candle = d3.select(this);
+                    candle.attr('style', 'fill:' + spec.highlightColor + ';stroke:' + spec.highlightColor + ';');
+                    var candleX = d3.transform(candle.attr('transform')).translate[0];
+                    var candleY = d3.transform(candle.attr('transform')).translate[1];
+                    div.style('display', 'block');
+                    if (candleX < 85) {
+                        var left = (candleX + spec.margin.left + xWidth + 10);
+                    } else {
+                        left = (candleX + spec.margin.left - 95);
+                    }
+                    div.style('left', left + 'px');
+                    div.style('top', (candleY + spec.margin.top) + 'px');
+                    div.html(d3.time.format(spec.xAxisFormat)(d['Time'])
+                            + '<br/>High: ' + d['HIGH'] + '<br/>Low: ' + d['LOW']
+                            + '<br/>First: ' + d['FIRST'] + '<br/>Last: ' + d['LAST']);
+                });
+                g.on('mouseout', function(d) {
+                    d3.select(this).attr('style', getCandleGroupStyle(d));
+                    div.style('display', 'none');
+                });
+            }
+
+            function updateCandlesticks() {
+                var xWidth = spec.width / (xScale.domain()[1] - xScale.domain()[0]) * candleTimeInMs;
+                var g = chartContainer.selectAll('.candlestick');
+                g.attr('transform', function(d) {return 'translate(' + xScale(d['Time']) + ', ' + yScale(d['HIGH'])+ ')'});
+                g.attr('visibility', function(d) { return isCandleVisible(xScale, candleTimeInMs, d) ? 'visible' : 'hidden';});
+                g.selectAll('rect').attr('width', xWidth);
+                g.selectAll('line').attr('width', xWidth)
+                        .attr('x1', xWidth / 2)
+                        .attr('x2', xWidth / 2);
+            }
+
+            function brushed() {
+                xScale.domain(brush.empty() ? xScale.domain() : brush.extent());
+                chartContainer.select('.x.axis').call(xAxis)
+                        .selectAll('g').filter(function(d) { return d; })
+                        .classed('minor', true);
+                updateCandlesticks();
+            }
 
             return instance;
         };
@@ -144,21 +184,29 @@
             }
         }
 
+        function getCandleTimeInMs(data) {
+            return data[1]['Time'] - data[0]['Time'];
+        }
+
+        function isCandleVisible(xScale, candleTimeInMs, d) {
+            return d['Time'] >= xScale.domain()[0] && d['Time'].getTime() + candleTimeInMs <= xScale.domain()[1].getTime();
+        }
+
         return instance;
     }
 
     var widget = CandleStickWidget({element: '#chart'
         , width: 700
         , height: 400
-        , margin: {top: 20, right: 20, bottom: 20, left: 50}
-        , xAxisFormat: '%H:%M'
+        , margin: {top: 20, right: 40, bottom: 30, left: 50, top2: 10, bottom2: 10}
+        , xAxisFormat: '%d %b, %H:%M'
         , yAxisFormat: '.5f'
         , downColor: '#E00000'
         , upColor: '#009900'
         , highlightColor: '#FFD732'
     });
 
-    d3.csv('aud_usd.csv', function(data) {
+    d3.csv('aud_usd1.csv', function(data) {
         var dateFormat = d3.time.format('%Y/%m/%d %H:%M:%S.%L');
         data.forEach(function(d) {
             d['HIGH'] = +d['HIGH'];
