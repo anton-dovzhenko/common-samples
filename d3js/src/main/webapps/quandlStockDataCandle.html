@@ -43,12 +43,12 @@
         </select>
         <span>
             Zoom:
-            <span class="candleSizeBtn">1d</span>
-            <span class="candleSizeBtn">5d</span>
-            <span class="candleSizeBtn">1m</span>
-            <span class="candleSizeBtn">3m</span>
-            <span class="candleSizeBtn">6m</span>
-            <span class="candleSizeBtn">YTD</span>
+            <span class="candleSizeBtn" data-field-zoom="1d">1d</span>
+            <span class="candleSizeBtn" data-field-zoom="5d">5d</span>
+            <span class="candleSizeBtn" data-field-zoom="1m">1m</span>
+            <span class="candleSizeBtn" data-field-zoom="3m">3m</span>
+            <span class="candleSizeBtn" data-field-zoom="6m">6m</span>
+            <span class="candleSizeBtn" data-field-zoom="YTD">YTD</span>
         </span>
     </div>​
     <svg id="chart"></svg>
@@ -58,32 +58,33 @@
 <script type="text/javascript" src="js/CandleStickWidget.js"></script>
 <script type="text/javascript">
 
-    var candleSize = 'daily';
-    var candleTimeInMs = 86400000;
+    var dateFormat = d3.time.format('%Y-%m-%d');
 
-    var tickersComboBox = d3.select("#tickers");
-    tickersComboBox.on('change', refreshChart);
-    var candleSizes = d3.selectAll('span.candleSizeBtn');
-    candleSizes.on('click', function() {
-        var selected = d3.select(this);
-        var temp = selected.attr('data-field-period');
-        if (temp != candleSize) {
-            candleSize = temp;
-            refreshChart()
-        }
+    var widget = CandleStickWidget({element: '#chart'
+        , width: 700
+        , height: 400
+        , margin: {top: 20, right: 40, bottom: 30, left: 50, top2: 10, bottom2: 10}
+        , xAxisFormat: '%d %b'
+        , xFocusAxisFormat: '%Y'
+        , xFocusRelativeSize: 0.15
+        , labelTimeFormat: '%d %b %Y'
+        , yAxisFormat: '.2f'
+        , yScaleMargin: 0.5
+        , downColor: '#d14836'
+        , upColor: '#093'
+        , highlightColor: '#FFD732'
     });
 
     var refreshChart = function() {
         var source = tickersComboBox.node().options[tickersComboBox.node().selectedIndex].value;
         console.log(source);
-        var url = getQuandlUrl(new Date(2012, 0, 1), new Date(2014, 11, 31), source, candleSize);
+        var url = getQuandlUrl(new Date(1900, 0, 1), new Date(2014, 11, 31), source, 'daily');
         console.log(url);
         d3.selectAll("#chart > *").remove();
         var container = d3.select("#container");
         container.attr('class', 'container loading');
         d3.csv(url, function(data) {
             container.attr('class', 'container');
-            var dateFormat = d3.time.format('%Y-%m-%d');
             data.forEach(function(d) {
                 d['High'] = +d['High'];
                 d['Low'] = +d['Low'];
@@ -95,18 +96,17 @@
         });
     };
 
+    var tickersComboBox = d3.select("#tickers");
+    tickersComboBox.on('change', refreshChart);
+    var candleSizes = d3.selectAll('span.candleSizeBtn');
+    console.log(candleSizes);
+    candleSizes.on('click', function() {
+        var selected = d3.select(this);
+        widget.setBrushDomain(selected.attr('data-field-zoom'));
+    });
+
     refreshChart();
 
-    var widget = CandleStickWidget({element: '#chart'
-        , width: 700
-        , height: 400
-        , margin: {top: 20, right: 40, bottom: 30, left: 50, top2: 10, bottom2: 10}
-        , xAxisFormat: '%d %b'
-        , yAxisFormat: '.2f'
-        , downColor: '#E00000'
-        , upColor: '#009900'
-        , highlightColor: '#FFD732'
-    });
 
 //https://www.quandl.com/api/v1/datasets/WIKI/AAPL.csv?column=4&sort_order=asc&collapse=quarterly&trim_start=2012-01-01&trim_end=2013-12-31
 </script>
