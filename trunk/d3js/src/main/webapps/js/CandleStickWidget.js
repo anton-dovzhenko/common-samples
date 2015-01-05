@@ -9,11 +9,11 @@ function CandleStickWidget(spec) {
         var totalHeight = spec.height + spec.margin.top + spec.margin.bottom
             + spec.margin.top2 + spec.margin.bottom2;
         var totalWidth = spec.width + spec.margin.left + spec.margin.right;
-        var mainChartHeight = spec.height * 0.8;
-        var focusChartHeight = spec.height * 0.2;
+        var mainChartHeight = spec.height * (1 - spec.xFocusRelativeSize);
+        var focusChartHeight = spec.height * spec.xFocusRelativeSize;
 
-        var yMin = d3.min(data, function(d) {return d['Low'];});
-        var yMax = d3.max(data, function(d) {return d['High'];});
+        var yMin = d3.min(data, function(d) {return d['Low'];}) - spec.yScaleMargin;
+        var yMax = d3.max(data, function(d) {return d['High'];}) + spec.yScaleMargin;
         var xMin = d3.min(data, function(d) {return d['Time'];});
         var xMax = d3.max(data, function(d) {return d['Time'];});
         xMax = new Date(xMax.getTime() + candleTimeInMs);
@@ -28,7 +28,7 @@ function CandleStickWidget(spec) {
         var yAxis = d3.svg.axis().scale(yScale).orient('left').ticks(5)
             .tickFormat(d3.format(spec.yAxisFormat)).tickSize(-spec.width);
         var xFocusAxis = d3.svg.axis().scale(xFocusScale).orient('bottom').ticks(5)
-            .tickFormat(d3.time.format(spec.xAxisFormat));
+            .tickFormat(d3.time.format(spec.xFocusAxisFormat));
         var yFocusAxis = d3.svg.axis().scale(yFocusScale).orient('left').ticks(2)
             .tickFormat(d3.format(spec.yAxisFormat)).tickSize(-spec.width);
 
@@ -99,26 +99,20 @@ function CandleStickWidget(spec) {
             var xWidth = spec.width / (xScale.domain()[1] - xScale.domain()[0]) * candleTimeInMs;
             //var xWidth = (xScale(xMax) - xScale(xMin)) / data.length;
 
+            //Adding candlesticks
             var g = chartContainer.selectAll('g').data(data).enter()
                 .append('g')
                 .attr('class', 'candlestick')
-                .attr('transform', function(d) {return 'translate(' + xScale(d['Time']) + ', ' + yScale(d['High'])+ ')'})
                 .attr('style', function(d) {return getCandleGroupStyle(d)});
             g.append('rect')
                 .attr('x', 0)
-                .attr('y', function(d) {return Math.min(yScale(d['Open']), yScale(d['Close'])) - yScale(d['High']);})
-                .attr('width', xWidth)
-                .attr('height', function(d) {
-                    return Math.abs(yScale(d['Open']) - yScale(d['Close']));
-                })
                 .attr('style', 'stroke:white;stroke-width:2;');
-
             g.append('line')
-                .attr('x1', xWidth / 2)
-                .attr('x2', xWidth / 2)
                 .attr('y1', 0)
-                .attr('y2', function(d) {return - yScale(d['High']) + yScale(d['Low']);})
                 .attr('stroke-width', 2);
+            //Update candlesticks size and position
+            updateCandlesticks();
+
             g.on('mouseover', function(d) {
                 var candle = d3.select(this);
                 candle.attr('style', 'fill:' + spec.highlightColor + ';stroke:' + spec.highlightColor + ';');
@@ -132,7 +126,7 @@ function CandleStickWidget(spec) {
                 }
                 div.style('left', left + 'px');
                 div.style('top', (candleY + spec.margin.top) + 'px');
-                div.html(d3.time.format(spec.xAxisFormat)(d['Time'])
+                div.html(d3.time.format(spec.labelTimeFormat)(d['Time'])
                 + '<br/>Open: ' + d['Open'] + '<br/>High: ' + d['High']
                 + '<br/>Low: ' + d['Low'] + '<br/>Close: ' + d['Close']);
             });
@@ -147,17 +141,23 @@ function CandleStickWidget(spec) {
             var g = chartContainer.selectAll('.candlestick');
             g.attr('transform', function(d) {return 'translate(' + xScale(d['Time']) + ', ' + yScale(d['High'])+ ')'});
             g.attr('visibility', function(d) { return isCandleVisible(xScale, candleTimeInMs, d) ? 'visible' : 'hidden';});
-            g.selectAll('rect').attr('width', xWidth);
+            g.selectAll('rect').attr('width', xWidth)
+                .attr('y', function(d) {return Math.min(yScale(d['Open']), yScale(d['Close'])) - yScale(d['High']);})
+                .attr('height', function(d) {
+                    return Math.abs(yScale(d['Open']) - yScale(d['Close']));
+                })
+            ;
             g.selectAll('line').attr('width', xWidth)
                 .attr('x1', xWidth / 2)
-                .attr('x2', xWidth / 2);
+                .attr('x2', xWidth / 2)
+                .attr('y2', function(d) {return - yScale(d['High']) + yScale(d['Low']);});
         }
 
         function brushed() {
             xScale.domain(brush.empty() ? xScale.domain() : brush.extent());
             var filteredDate = data.filter(function(d) { return isCandleVisible(xScale, candleTimeInMs, d); });
-            var yMin = d3.min(filteredDate, function(d) {return d['Low'];});
-            var yMax = d3.max(filteredDate, function(d) {return d['High'];});
+            var yMin = d3.min(filteredDate, function(d) {return d['Low'];}) - spec.yScaleMargin;
+            var yMax = d3.max(filteredDate, function(d) {return d['High'];}) + spec.yScaleMargin;
             yScale.domain([yMin, yMax]);
             chartContainer.select('.x.axis').call(xAxis)
                 .selectAll('g').filter(function(d) { return d; })
@@ -166,6 +166,38 @@ function CandleStickWidget(spec) {
                 .selectAll('g').filter(function(d) { return d; })
                 .classed('minor', true);
             updateCandlesticks();
+        }
+
+        instance.setBrushDomain = function(xMin, xMax) {
+            brush.extent([xMin, xMax]);
+            brush(d3.select('.brush').transition());
+            brush.event(d3.select('.brush').transition().delay(1000));
+            brushed();
+        };
+
+        instance.setBrushDomain = function(zoom) {
+            console.log('zoom= ' + zoom);
+            var xTempMax = xScale.domain()[1];
+            var temp = new Date(xMax.getTime());
+            if (zoom == '1d') {
+                temp = d3.time.day.offset(temp, -2);
+            } else if(zoom == '5d' ) {
+                temp = d3.time.day.offset(temp, -5);
+            } else if (zoom == '1m') {
+                temp = d3.time.month.offset(temp, -1);
+            } else if (zoom == '3m') {
+                temp = d3.time.month.offset(temp, -3);
+            } else if (zoom == '6m') {
+                temp = d3.time.month.offset(temp, -6);
+            } else if (zoom == 'YTD') {
+                temp = new Date(xMax.getYear(), 0, 1);
+                xTempMax = xMax;
+            }
+            var xTempMin = new Date(Math.max(temp.getTime(), xMin.getTime()));
+            brush.extent([xTempMin, xTempMax]);
+            brush(d3.select('.brush').transition());
+            brush.event(d3.select('.brush').transition().delay(1000));
+            brushed();
         }
 
         return instance;
@@ -180,6 +212,7 @@ function CandleStickWidget(spec) {
     }
 
     function getCandleTimeInMs(data) {
+        //FIXME: calculate candle width in milliseconds
         return 86400000;//data[1]['Time'] - data[0]['Time'];
     }
 
