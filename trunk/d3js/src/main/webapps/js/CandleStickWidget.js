@@ -2,10 +2,8 @@ function CandleStickWidget(spec) {
 
     var instance = {};
 
-    instance.render = function(data) {
+    instance.render = function(data, candleTimeInMs) {
 
-        var candleTimeInMs = getCandleTimeInMs(data);
-        console.log(candleTimeInMs);
         var totalHeight = spec.height + spec.margin.top + spec.margin.bottom
             + spec.margin.top2 + spec.margin.bottom2;
         var totalWidth = spec.width + spec.margin.left + spec.margin.right;
@@ -109,7 +107,7 @@ function CandleStickWidget(spec) {
                 .attr('style', 'stroke:white;stroke-width:2;');
             g.append('line')
                 .attr('y1', 0)
-                .attr('stroke-width', 2);
+                .attr('stroke-width', 1);
             //Update candlesticks size and position
             updateCandlesticks();
 
@@ -176,9 +174,10 @@ function CandleStickWidget(spec) {
         };
 
         instance.setBrushDomain = function(zoom) {
+            var dateFormat = d3.time.format('%Y-%m-%d');
             console.log('zoom= ' + zoom);
             var xTempMax = xScale.domain()[1];
-            var temp = new Date(xMax.getTime());
+            var temp = new Date(xTempMax.getTime());
             if (zoom == '1d') {
                 temp = d3.time.day.offset(temp, -2);
             } else if(zoom == '5d' ) {
@@ -190,8 +189,9 @@ function CandleStickWidget(spec) {
             } else if (zoom == '6m') {
                 temp = d3.time.month.offset(temp, -6);
             } else if (zoom == 'YTD') {
-                temp = new Date(xMax.getYear(), 0, 1);
-                xTempMax = xMax;
+                temp = new Date(xMax);
+                temp.setMonth(0, 1);
+                xTempMax = new Date(xMax);
             }
             var xTempMin = new Date(Math.max(temp.getTime(), xMin.getTime()));
             brush.extent([xTempMin, xTempMax]);
@@ -209,11 +209,6 @@ function CandleStickWidget(spec) {
         } else {
             return 'fill:' + spec.downColor + ';stroke:' + spec.downColor + ';';
         }
-    }
-
-    function getCandleTimeInMs(data) {
-        //FIXME: calculate candle width in milliseconds
-        return 86400000;//data[1]['Time'] - data[0]['Time'];
     }
 
     function isCandleVisible(xScale, candleTimeInMs, d) {
