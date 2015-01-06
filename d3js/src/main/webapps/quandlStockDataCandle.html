@@ -9,7 +9,7 @@
             height: 550px;
             width: 800px;
         }
-        .tickers {
+        .ticker {
             margin: 5px;
         }
         .loading {
@@ -35,7 +35,7 @@
 <body>
 <div id="container" class="container">
     <div>
-        <select id="tickers" name="tickers" class="tickers">
+        <select id="ticker" name="ticker" class="ticker">
             <option value ="EPAM">EPAM</option>
             <option value ="GOOG">GOOG</option>
             <option value ="LXFT">LXFT</option>
@@ -50,6 +50,13 @@
             <span class="candleSizeBtn" data-field-zoom="6m">6m</span>
             <span class="candleSizeBtn" data-field-zoom="YTD">YTD</span>
         </span>
+        <span>
+            Period:
+            <select id="period" name="period" class="period">
+                <option value ="daily" data-field-ms="86400000">daily</option>
+                <option value ="weekly" data-field-ms="604800000">weekly</option>
+            </select>
+        </span>
     </div>​
     <svg id="chart"></svg>
 </div>
@@ -59,6 +66,9 @@
 <script type="text/javascript">
 
     var dateFormat = d3.time.format('%Y-%m-%d');
+    var tickersComboBox = d3.select('#ticker');
+    var zoomButtons = d3.selectAll('span.candleSizeBtn');
+    var periodComboBox = d3.select('#period');
 
     var widget = CandleStickWidget({element: '#chart'
         , width: 700
@@ -76,9 +86,10 @@
     });
 
     var refreshChart = function() {
-        var source = tickersComboBox.node().options[tickersComboBox.node().selectedIndex].value;
-        console.log(source);
-        var url = getQuandlUrl(new Date(1900, 0, 1), new Date(2014, 11, 31), source, 'daily');
+        var ticker = tickersComboBox.select('option:checked').attr('value');
+        var period = periodComboBox.select('option:checked').attr('value');
+        var periodMs = +periodComboBox.select('option:checked').attr('data-field-ms');
+        var url = getQuandlUrl(new Date(1900, 0, 1), new Date(), ticker, period);
         console.log(url);
         d3.selectAll("#chart > *").remove();
         var container = d3.select("#container");
@@ -92,15 +103,14 @@
                 d['Open'] = +d['Open'];
                 d['Time'] = dateFormat.parse(d['Date']);
             });
-            widget.render(data);
+            //candleTimeInMs
+            widget.render(data, periodMs);
         });
     };
 
-    var tickersComboBox = d3.select("#tickers");
     tickersComboBox.on('change', refreshChart);
-    var candleSizes = d3.selectAll('span.candleSizeBtn');
-    console.log(candleSizes);
-    candleSizes.on('click', function() {
+    periodComboBox.on('change', refreshChart);
+    zoomButtons.on('click', function() {
         var selected = d3.select(this);
         widget.setBrushDomain(selected.attr('data-field-zoom'));
     });
