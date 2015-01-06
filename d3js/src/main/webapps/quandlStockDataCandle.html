@@ -85,18 +85,18 @@
         , highlightColor: '#FFD732'
     });
 
-    var refreshChart = function() {
+    var refreshChart = function(saveBrushDomain) {
         var ticker = tickersComboBox.select('option:checked').attr('value');
         var period = periodComboBox.select('option:checked').attr('value');
         var periodMs = +periodComboBox.select('option:checked').attr('data-field-ms');
-        var url = getQuandlUrl(new Date(1900, 0, 1), new Date(), ticker, period);
+        var url = getCachedQuandlUrl(ticker, period);
         console.log(url);
         d3.selectAll("#chart > *").remove();
         var container = d3.select("#container");
         container.attr('class', 'container loading');
         d3.csv(url, function(data) {
             container.attr('class', 'container');
-            data.forEach(function(d) {
+            data.forEach(function (d) {
                 d['High'] = +d['High'];
                 d['Low'] = +d['Low'];
                 d['Close'] = +d['Close'];
@@ -105,12 +105,23 @@
             });
             //candleTimeInMs
             widget.render(data, periodMs);
-            widget.setZoomBrushDomain('3m');
+            if (saveBrushDomain && widget.getLastBrushDomain()) {
+                widget.setBrushDomain(widget.getLastBrushDomain()[0], widget.getLastBrushDomain()[1]);
+            } else {
+                widget.setZoomBrushDomain('3m');
+            }
         });
     };
 
-    tickersComboBox.on('change', refreshChart);
-    periodComboBox.on('change', refreshChart);
+    var refreshChartAndSaveBrushDomain = function() {
+        refreshChart(true);
+    };
+    var refreshChartWithoutSaveBrushDomain = function() {
+        refreshChart(false);
+    };
+
+    tickersComboBox.on('change', refreshChartWithoutSaveBrushDomain);
+    periodComboBox.on('change', refreshChartAndSaveBrushDomain);
     zoomButtons.on('click', function() {
         var selected = d3.select(this);
         widget.setZoomBrushDomain(selected.attr('data-field-zoom'));

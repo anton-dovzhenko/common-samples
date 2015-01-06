@@ -12,8 +12,13 @@ function getQuandlUrl(trimStart, trimEnd, ticker, collapse) {
     var token = 'xxsYxkwJkWzuH2zDpQNz'
     var format = d3.time.format('%Y-%m-%d');
     return url + ticker + '.csv?sort_order=asc&collapse=' + collapse
-            + '&trim_start=' + format(trimStart)
-            + '&trim_end=' + format(trimEnd)
-            + '&auth_token=' + token;
+        + '&trim_start=' + format(trimStart)
+        + '&trim_end=' + format(trimEnd)
+        + '&auth_token=' + token;
+
+}
+
+function getCachedQuandlUrl(ticker, collapse) {
+    return 'cache/WIKI-' + ticker + '-' + collapse + '.csv';
 
 }
