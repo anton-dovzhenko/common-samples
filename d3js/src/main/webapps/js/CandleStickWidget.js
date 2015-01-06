@@ -173,7 +173,7 @@ function CandleStickWidget(spec) {
             brushed();
         };
 
-        instance.setBrushDomain = function(zoom) {
+        instance.setZoomBrushDomain = function(zoom) {
             var dateFormat = d3.time.format('%Y-%m-%d');
             console.log('zoom= ' + zoom);
             var xTempMax = xScale.domain()[1];
@@ -194,11 +194,16 @@ function CandleStickWidget(spec) {
                 xTempMax = new Date(xMax);
             }
             var xTempMin = new Date(Math.max(temp.getTime(), xMin.getTime()));
-            brush.extent([xTempMin, xTempMax]);
+            instance.setBrushDomain(xTempMin, xTempMax);
+        };
+
+        instance.setBrushDomain = function(brushStart, brushEnd) {
+            console.log(brushStart + ' ____ ' + brushEnd);
+            brush.extent([brushStart, brushEnd]);
             brush(d3.select('.brush').transition());
             brush.event(d3.select('.brush').transition().delay(1000));
             brushed();
-        }
+        };
 
         return instance;
     };

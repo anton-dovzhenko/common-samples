@@ -105,6 +105,7 @@
             });
             //candleTimeInMs
             widget.render(data, periodMs);
+            widget.setZoomBrushDomain('3m');
         });
     };
 
@@ -112,7 +113,7 @@
     periodComboBox.on('change', refreshChart);
     zoomButtons.on('click', function() {
         var selected = d3.select(this);
-        widget.setBrushDomain(selected.attr('data-field-zoom'));
+        widget.setZoomBrushDomain(selected.attr('data-field-zoom'));
     });
 
     refreshChart();
