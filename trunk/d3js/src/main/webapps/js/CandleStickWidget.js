@@ -1,6 +1,11 @@
 function CandleStickWidget(spec) {
 
     var instance = {};
+    var lastBrushDomain;
+
+    instance.getLastBrushDomain = function() {
+        return lastBrushDomain;
+    }
 
     instance.render = function(data, candleTimeInMs) {
 
@@ -152,7 +157,8 @@ function CandleStickWidget(spec) {
         }
 
         function brushed() {
-            xScale.domain(brush.empty() ? xScale.domain() : brush.extent());
+            lastBrushDomain = brush.empty() ? xScale.domain() : brush.extent();
+            xScale.domain(lastBrushDomain);
             var filteredDate = data.filter(function(d) { return isCandleVisible(xScale, candleTimeInMs, d); });
             var yMin = d3.min(filteredDate, function(d) {return d['Low'];}) - spec.yScaleMargin;
             var yMax = d3.max(filteredDate, function(d) {return d['High'];}) + spec.yScaleMargin;
@@ -169,13 +175,11 @@ function CandleStickWidget(spec) {
         instance.setBrushDomain = function(xMin, xMax) {
             brush.extent([xMin, xMax]);
             brush(d3.select('.brush').transition());
-            brush.event(d3.select('.brush').transition().delay(1000));
             brushed();
         };
 
         instance.setZoomBrushDomain = function(zoom) {
             var dateFormat = d3.time.format('%Y-%m-%d');
-            console.log('zoom= ' + zoom);
             var xTempMax = xScale.domain()[1];
             var temp = new Date(xTempMax.getTime());
             if (zoom == '1d') {
@@ -195,14 +199,6 @@ function CandleStickWidget(spec) {
             }
             var xTempMin = new Date(Math.max(temp.getTime(), xMin.getTime()));
             instance.setBrushDomain(xTempMin, xTempMax);
-        };
-
-        instance.setBrushDomain = function(brushStart, brushEnd) {
-            console.log(brushStart + ' ____ ' + brushEnd);
-            brush.extent([brushStart, brushEnd]);
-            brush(d3.select('.brush').transition());
-            brush.event(d3.select('.brush').transition().delay(1000));
-            brushed();
         };
 
         return instance;
