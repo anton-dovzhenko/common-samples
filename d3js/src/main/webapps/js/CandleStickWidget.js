@@ -15,21 +15,36 @@ function CandleStickWidget(spec) {
         var mainChartHeight = spec.height * (1 - spec.xFocusRelativeSize);
         var focusChartHeight = spec.height * spec.xFocusRelativeSize;
 
-        var yMin = d3.min(data, function(d) {return d['Low'];}) - spec.yScaleMargin;
-        var yMax = d3.max(data, function(d) {return d['High'];}) + spec.yScaleMargin;
+        var yMin = d3.min(data, function(d) {return d['Low'];});
+        var yMax = d3.max(data, function(d) {return d['High'];});
+        var yDiff = yMax - yMin;
+
+        yMin = yMin - spec.yScaleMargin;
+        yMax = yMax + spec.yScaleMargin;
         var xMin = d3.min(data, function(d) {return d['Time'];});
         var xMax = d3.max(data, function(d) {return d['Time'];});
         xMax = new Date(xMax.getTime() + candleTimeInMs);
 
+        var yVolMin = 0;
+        var yVolMax = d3.max(data, function(d) {return d['Volume'];});
+
         var xScale = d3.time.scale().range([0, spec.width]).domain([xMin, xMax]);
-        var yScale = d3.scale.linear().range([mainChartHeight, 0]).domain([yMin, yMax]);
+        var yScale = d3.scale.linear().range([mainChartHeight, 0]).domain([yMin - yDiff * spec.volChartRelSize, yMax]);
+
+        var yVolumeScale = d3.scale.linear().range([mainChartHeight * spec.volChartRelSize, 0]).domain([yVolMin, yVolMax]);
+
         var xFocusScale = d3.time.scale().range([0, spec.width]).domain([xMin, xMax]);
         var yFocusScale = d3.scale.linear().range([focusChartHeight, 0]).domain([yMin, yMax]);
 
-        var xAxis = d3.svg.axis().scale(xScale).orient('bottom').ticks(5)
+        var xAxis = d3.svg.axis().scale(xScale).orient('bottom').ticks(10)
             .tickFormat(d3.time.format(spec.xAxisFormat)).tickSize(-mainChartHeight);
         var yAxis = d3.svg.axis().scale(yScale).orient('left').ticks(5)
             .tickFormat(d3.format(spec.yAxisFormat)).tickSize(-spec.width);
+
+        var yVolumeAxis = d3.svg.axis().scale(yVolumeScale).orient('right').ticks(3)
+            .tickSize(2)
+            .tickFormat(function(d) {return d3.format(spec.volumeFormat)(d / 1000) + 'K'});
+
         var xFocusAxis = d3.svg.axis().scale(xFocusScale).orient('bottom').ticks(5)
             .tickFormat(d3.time.format(spec.xFocusAxisFormat));
         var yFocusAxis = d3.svg.axis().scale(yFocusScale).orient('left').ticks(2)
@@ -63,6 +78,14 @@ function CandleStickWidget(spec) {
             .call(xAxis);
         gx.selectAll('g').filter(function(d) { return d; })
             .classed('minor', true);
+
+        //Creating Volume Chart
+        var gyVolume = chartContainer.append('g')
+            .attr('class', 'yVol axis')
+            .attr('transform', 'translate(' + spec.width + ', ' + (mainChartHeight * 0.75) + ')')
+            .style('fill', 'steelblue')
+            .call(yVolumeAxis);
+        createVolumeBars();
 
         //Create Focus Chart
         var chartFocusContainer = svg.append('g')
@@ -111,7 +134,7 @@ function CandleStickWidget(spec) {
                 .attr('style', function(d) {return getCandleGroupStyle(d)});
             g.append('rect')
                 .attr('x', 0)
-                .attr('style', 'stroke:white;stroke-width:1;');
+                .attr('style', 'stroke:white; stroke-width:1;');
             g.append('line')
                 .attr('y1', 0)
                 .attr('stroke-width', 1);
@@ -133,12 +156,21 @@ function CandleStickWidget(spec) {
                 div.style('top', (candleY + spec.margin.top) + 'px');
                 div.html(d3.time.format(spec.labelTimeFormat)(d['Time'])
                 + '<br/>Open: ' + d['Open'] + '<br/>High: ' + d['High']
-                + '<br/>Low: ' + d['Low'] + '<br/>Close: ' + d['Close']);
+                + '<br/>Low: ' + d['Low'] + '<br/>Close: ' + d['Close']
+                + '<br/>Vol: ' + d3.format(spec.volumeFormat)(d['Volume']));
             });
             g.on('mouseout', function(d) {
                 d3.select(this).attr('style', getCandleGroupStyle(d));
                 div.style('display', 'none');
             });
+        }
+
+        function createVolumeBars() {
+            var g = chartContainer.selectAll('rect.volume').data(data).enter()
+                .append('rect')
+                .attr('class', 'volume')
+                .attr('style', function(d) {return getVolumeBarStyle(d)});
+
         }
 
         function updateCandlesticks() {
@@ -158,20 +190,39 @@ function CandleStickWidget(spec) {
                 .attr('y2', function(d) {return - yScale(d['High']) + yScale(d['Low']);});
         }
 
+        function updateVolumeBars() {
+            var xWidth = spec.width / (xScale.domain()[1] - xScale.domain()[0]) * candleTimeInMs;
+            var rect = chartContainer.selectAll('.volume');
+            rect.attr('width', xWidth - 2 > 0 ? xWidth - 2 : xWidth)
+                .attr('height', function(d) {return spec.volChartRelSize * mainChartHeight - yVolumeScale(d['Volume'])})
+                .attr('y', function(d) {return (1 - spec.volChartRelSize) * mainChartHeight + yVolumeScale(d['Volume'])})
+                .attr('x', function(d) {return xScale(d['Time']) + 0.5})
+                .attr('visibility', function(d) { return isCandleVisible(xScale, candleTimeInMs, d) ? 'visible' : 'hidden';});
+            ;
+        }
+
         function brushed() {
             lastBrushDomain = brush.empty() ? xScale.domain() : brush.extent();
             xScale.domain(lastBrushDomain);
             var filteredDate = data.filter(function(d) { return isCandleVisible(xScale, candleTimeInMs, d); });
-            var yMin = d3.min(filteredDate, function(d) {return d['Low'];}) - spec.yScaleMargin;
-            var yMax = d3.max(filteredDate, function(d) {return d['High'];}) + spec.yScaleMargin;
-            yScale.domain([yMin, yMax]);
+            var yMin = d3.min(filteredDate, function(d) {return d['Low'];});
+            var yMax = d3.max(filteredDate, function(d) {return d['High'];});
+            var yDiff = yMax - yMin;
+            yMin = yMin - spec.yScaleMargin;
+            yMax = yMax + spec.yScaleMargin;
+            var yVolMax = d3.max(filteredDate, function(d) {return d['Volume'];}) + spec.yScaleMargin;
+            yScale.domain([yMin  - yDiff * spec.volChartRelSize, yMax]);
+            yVolumeScale.domain([yMin, yVolMax]);
             chartContainer.select('.x.axis').call(xAxis)
                 .selectAll('g').filter(function(d) { return d; })
                 .classed('minor', true);
             chartContainer.select('.y.axis').call(yAxis)
                 .selectAll('g').filter(function(d) { return d; })
                 .classed('minor', true);
+
+            chartContainer.select('.yVol.axis').call(yVolumeAxis);
             updateCandlesticks();
+            updateVolumeBars();
         }
 
         instance.setBrushDomain = function(xMin, xMax) {
@@ -211,6 +262,14 @@ function CandleStickWidget(spec) {
             return 'fill:' + spec.upColor + ';stroke:' + spec.upColor + ';';
         } else {
             return 'fill:' + spec.downColor + ';stroke:' + spec.downColor + ';';
+        }
+    }
+
+    function getVolumeBarStyle(d) {
+        if (d['Close'] >= d['Open']) {
+            return 'stroke-width: 1; fill:' + spec.upBarFillColor + ';stroke:' + spec.upBarStrokeColor + ';';
+        } else {
+            return 'stroke-width: 1; fill:' + spec.downBarFillColor + ';stroke:' + spec.downBarStrokeColor + ';';
         }
     }
 

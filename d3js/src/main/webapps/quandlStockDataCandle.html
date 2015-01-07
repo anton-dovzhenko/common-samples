@@ -6,8 +6,8 @@
     <link rel="stylesheet" type="text/css" href="candlestick.css"/>
     <style>
         .container {
-            height: 500px;
-            width: 1000px;
+            height: 550px;
+            width: 850px;
         }
         .ticker {
             margin: 5px;
@@ -71,20 +71,24 @@
     var periodComboBox = d3.select('#period');
 
     var widget = CandleStickWidget({element: '#chart'
-        , width: 900
-        , height: 300
-        , margin: {top: 20, right: 40, bottom: 30, left: 50, top2: 10, bottom2: 10}
+        , width: 750
+        , height: 400
+        , margin: {top: 20, right: 50, bottom: 30, left: 50, top2: 10, bottom2: 10}
         , xAxisFormat: '%d %b'
         , xFocusAxisFormat: '%Y'
         , xFocusRelativeSize: 0.15
+        , volChartRelSize: 0.2
         , labelTimeFormat: '%d %b %Y'
         , yAxisFormat: '.2f'
         , yScaleMargin: 0.5
-        //, downColor: '#d14836'
         , downColor: 'rgb(208, 0, 48)'
-        //, upColor: '#093'
         , upColor: 'rgb(0, 121, 39)'
+        , downBarStrokeColor: 'rgba(208, 0, 48, 1)'
+        , upBarStrokeColor: 'rgba(0, 121, 39, 1)'
+        , downBarFillColor: 'rgba(208, 0, 48, 0.1)'
+        , upBarFillColor: 'rgba(0, 121, 39, 0.1)'
         , highlightColor: '#FFD732'
+        , volumeFormat: ','
     });
 
     var refreshChart = function(saveBrushDomain) {
@@ -103,9 +107,10 @@
                 d['Low'] = +d['Low'];
                 d['Close'] = +d['Close'];
                 d['Open'] = +d['Open'];
+                d['Volume'] = +d['Volume'];
                 d['Time'] = dateFormat.parse(d['Date']);
             });
-            //candleTimeInMs
+            //console.table(data);
             widget.render(data, periodMs);
             if (saveBrushDomain && widget.getLastBrushDomain()) {
                 widget.setBrushDomain(widget.getLastBrushDomain()[0], widget.getLastBrushDomain()[1]);
