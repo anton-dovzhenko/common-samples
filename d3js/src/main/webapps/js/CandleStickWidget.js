@@ -68,12 +68,14 @@ function CandleStickWidget(spec) {
         var chartFocusContainer = svg.append('g')
             .attr('transform', 'translate(' + spec.margin.left + ', '
             + (spec.margin.top + spec.margin.bottom + mainChartHeight) + ')');
-        var line = d3.svg.line()
+        var line = d3.svg.area()
             .x(function(d) { return xFocusScale(new Date(d['Time'].getTime() + candleTimeInMs/2)); })
-            .y(function(d) { return yFocusScale((d['High'] + d['Low']) / 2 ); });
+            .y1(function(d) { return yFocusScale((d['High'] + d['Low']) / 2 ); })
+            .y0(focusChartHeight);
+
         chartFocusContainer.append('path')
             .datum(data)
-            .attr('class', 'line')
+            .attr('class', 'area')
             .attr('d', line);
         var gfy = chartFocusContainer.append('g')
             .attr('class', 'y axis')
@@ -109,7 +111,7 @@ function CandleStickWidget(spec) {
                 .attr('style', function(d) {return getCandleGroupStyle(d)});
             g.append('rect')
                 .attr('x', 0)
-                .attr('style', 'stroke:white;stroke-width:2;');
+                .attr('style', 'stroke:white;stroke-width:1;');
             g.append('line')
                 .attr('y1', 0)
                 .attr('stroke-width', 1);

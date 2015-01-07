@@ -1,0 +1,10 @@
++ 1. Fix blinking on brush
++ 2. Save selected period and candle period change
+3. Add volume sub-chart
++ 4. Area instead of line on focus chart
+5. Spinning wheel on loading
++ 6. Stock data caching
+7. Add selected period markers
+8. Add interactive cross
+9. Add simple moving average
+10. Fix bug with daily/weekly switch
