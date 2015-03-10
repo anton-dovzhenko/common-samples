@@ -1,0 +1,24 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:container="urn:import:com.sencha.gxt.widget.core.client.container"
+             xmlns:grid="urn:import:com.sencha.gxt.widget.core.client.grid">
+
+    <ui:with type="com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer.HorizontalLayoutData" field="gridLayoutData">
+        <ui:attributes width="1" height="1" />
+    </ui:with>
+
+    <ui:with type="com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer.HorizontalLayoutData" field="lockedLayoutData" />
+
+    <container:HorizontalLayoutContainer>
+
+        <container:child layoutData="{lockedLayoutData}">
+            <grid:Grid ui:field="lockedGrid"/>
+        </container:child>
+
+        <container:child layoutData="{gridLayoutData}">
+            <grid:Grid ui:field="grid"/>
+        </container:child>
+
+    </container:HorizontalLayoutContainer>
+
+</ui:UiBinder>
