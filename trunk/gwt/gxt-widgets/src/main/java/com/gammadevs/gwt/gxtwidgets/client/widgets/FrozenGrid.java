@@ -29,7 +29,6 @@ public class FrozenGrid<T> implements IsWidget {
         public void doSelect(List<M> models, boolean keepExisting, boolean suppressEvent) {
             super.doSelect(models, keepExisting, suppressEvent);
         }
-
     }
 
     interface FrozenGridExampleUiBinder extends UiBinder<HorizontalLayoutContainer, FrozenGrid> {}
@@ -61,7 +60,7 @@ public class FrozenGrid<T> implements IsWidget {
         lockedGrid = new Grid<T>(store, lockCm) {
             @Override
             protected Size adjustSize(Size size) {
-                return new Size(size.getWidth() + XDOM.getScrollBarWidth() - 1, size.getHeight());
+                return new Size(size.getWidth() + XDOM.getScrollBarWidth(), size.getHeight());
             }
         };
         lockedGrid.setSelectionModel(lockedGridSelectionModel);
@@ -70,11 +69,9 @@ public class FrozenGrid<T> implements IsWidget {
         grid.setSelectionModel(gridSelectionModel);
 
         lockedLayoutData = new HorizontalLayoutContainer.HorizontalLayoutData(getLockedWidth(lockCm), 1);
-        lockedLayoutData.setMargins(new Margins(1, 0, XDOM.getScrollBarWidth(), 0));
+        lockedLayoutData.setMargins(new Margins(0, 0, XDOM.getScrollBarWidth(), 0));
 
         lockedGrid.getView().setAdjustForHScroll(false);
-
-        grid.setBorders(true);
 
         synchronizeScrolling();
         synchronizeSelection();
