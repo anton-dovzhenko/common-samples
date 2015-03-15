@@ -8,6 +8,7 @@
     <stylesheet src="reset.css" />
 
     <add-linker name="xsiframe"/>
+    <collapse-all-properties />
     <set-property name="user.agent" value="safari" />
 
     <entry-point class='com.gammadevs.gwt.gxtwidgets.client.GxtWidgetsEntryPoint'/>
