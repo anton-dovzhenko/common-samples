@@ -1,6 +1,7 @@
 package com.gammadevs.gwt.gxtwidgets.client;
 
 import com.gammadevs.gwt.gxtwidgets.client.examples.FrozenGridExample;
+import com.gammadevs.gwt.gxtwidgets.client.examples.FrozenPagingGridExample;
 import com.gammadevs.gwt.gxtwidgets.client.widgets.ExampleTreeItem;
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.ValueUpdater;
@@ -69,8 +70,8 @@ public class GxtWidgetsMainLayout implements IsWidget {
     public Cell<String> createCell() {
         return new SimpleSafeHtmlCell<String>(SimpleSafeHtmlRenderer.getInstance(), "click") {
             @Override
-            public void onBrowserEvent(Context context, Element parent, String value, NativeEvent event,
-                                       ValueUpdater<String> valueUpdater) {
+            public void onBrowserEvent(Context context, Element parent, String value, NativeEvent event
+                    , ValueUpdater<String> valueUpdater) {
                 super.onBrowserEvent(context, parent, value, event, valueUpdater);
                 if ("click".equals(event.getType())) {
                     ExampleTreeItem item = tree.getSelectionModel().getSelectedItem();
@@ -91,6 +92,9 @@ public class GxtWidgetsMainLayout implements IsWidget {
         switch (item.getType()) {
             case FROZEN_GRID:
                 widget = new FrozenGridExample().asWidget();
+                break;
+            case FROZEN_PAGING_GRID:
+                widget = new FrozenPagingGridExample().asWidget();
                 break;
             default:
                 throw new IllegalArgumentException("Type " + item.getType() + " is not supported");
@@ -130,6 +134,7 @@ public class GxtWidgetsMainLayout implements IsWidget {
         ExampleTreeItem gridRoot = new ExampleTreeItem("Grids", null);
         store.add(gridRoot);
         store.add(gridRoot, new ExampleTreeItem("Frozen Columns Grid", ExampleType.FROZEN_GRID));
+        store.add(gridRoot, new ExampleTreeItem("Frozen Columns Paging Grid", ExampleType.FROZEN_PAGING_GRID));
     }
 
 }

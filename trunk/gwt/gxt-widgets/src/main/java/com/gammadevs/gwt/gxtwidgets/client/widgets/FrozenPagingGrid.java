@@ -14,18 +14,23 @@ import com.sencha.gxt.core.client.util.Margins;
 import com.sencha.gxt.core.client.util.Size;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
+import com.sencha.gxt.data.shared.loader.LoadResultListStoreBinding;
+import com.sencha.gxt.data.shared.loader.PagingLoadConfig;
+import com.sencha.gxt.data.shared.loader.PagingLoadResult;
+import com.sencha.gxt.data.shared.loader.PagingLoader;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.BodyScrollEvent;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
 import com.sencha.gxt.widget.core.client.grid.GridSelectionModel;
+import com.sencha.gxt.widget.core.client.toolbar.PagingToolBar;
 
 import java.util.List;
 
-public class FrozenGrid<T> implements IsWidget {
+public class FrozenPagingGrid<T> implements IsWidget {
 
-    interface FrozenGridExampleUiBinder extends UiBinder<HorizontalLayoutContainer, FrozenGrid> {}
+    interface FrozenGridExampleUiBinder extends UiBinder<HorizontalLayoutContainer, FrozenPagingGrid> {}
     private static FrozenGridExampleUiBinder ourUiBinder = GWT.create(FrozenGridExampleUiBinder.class);
 
     private final ListStore<T> store;
@@ -41,12 +46,16 @@ public class FrozenGrid<T> implements IsWidget {
     Grid<T> lockedGrid;
     @UiField(provided = true)
     Grid<T> grid;
+    @UiField
+    PagingToolBar toolBar;
 
-    public FrozenGrid(
+    public FrozenPagingGrid(
             ModelKeyProvider<T> key
             , List<ColumnConfig<T, ?>> lockedColumns
-            , List<ColumnConfig<T, ?>> columns) {
+            , List<ColumnConfig<T, ?>> columns
+            , PagingLoader<PagingLoadConfig, PagingLoadResult<T>> loader) {
         store = new ListStore<>(key);
+        loader.addLoadHandler(new LoadResultListStoreBinding<PagingLoadConfig, T, PagingLoadResult<T>>(store));
         lockedGridSelectionModel = new FrozenGridSelectionModel<>();
         gridSelectionModel = new FrozenGridSelectionModel<>();
 
@@ -59,13 +68,15 @@ public class FrozenGrid<T> implements IsWidget {
                 return new Size(size.getWidth() + XDOM.getScrollBarWidth(), size.getHeight());
             }
         };
+        lockedGrid.setLoader(loader);
         lockedGrid.setSelectionModel(lockedGridSelectionModel);
 
         grid = new Grid<>(store, cm);
+        grid.setLoader(loader);
         grid.setSelectionModel(gridSelectionModel);
 
         lockedLayoutData = new HorizontalLayoutContainer.HorizontalLayoutData(getLockedWidth(lockCm), 1);
-        lockedLayoutData.setMargins(new Margins(0, 0, XDOM.getScrollBarWidth(), 0));
+        lockedLayoutData.setMargins(new Margins(0, 0, XDOM.getScrollBarWidth() + 23, 0));
 
         lockedGrid.getView().setAdjustForHScroll(false);
 
@@ -73,6 +84,8 @@ public class FrozenGrid<T> implements IsWidget {
         synchronizeSelection();
 
         rootElement = ourUiBinder.createAndBindUi(this);
+        toolBar.bind(loader);
+        loader.load();
 
     }
 
@@ -122,13 +135,9 @@ public class FrozenGrid<T> implements IsWidget {
         });
     }
 
-    public void setModel(List<T> items) {
-        store.clear();
-        store.addAll(items);
-    }
-
     public void stop() {
         lockedGridHandlerRegistration.removeHandler();
         gridHandlerRegistration.removeHandler();
     }
+
 }
