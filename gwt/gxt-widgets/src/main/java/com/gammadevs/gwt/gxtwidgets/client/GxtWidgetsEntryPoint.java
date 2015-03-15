@@ -7,10 +7,11 @@ import com.google.gwt.user.client.ui.*;
 /**
  * Created by Anton on 3/9/2015.
  */
-public class GxtWidgets implements EntryPoint {
+public class GxtWidgetsEntryPoint implements EntryPoint {
 
     public void onModuleLoad() {
-        RootLayoutPanel.get().add(new FrozenGridExample());
+        GxtWidgetsMainLayout layout = new GxtWidgetsMainLayout();
+        RootLayoutPanel.get().add(layout);
     }
 
 }
