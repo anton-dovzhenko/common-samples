@@ -29,27 +29,28 @@
 
     <ui:with type="com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer.HorizontalLayoutData" field="lockedLayoutData" />
 
-    <container:HorizontalLayoutContainer>
 
-        <container:child layoutData="{lockedLayoutData}">
-            <grid:Grid ui:field="lockedGrid"/>
-        </container:child>
+    <container:VerticalLayoutContainer>
 
-        <container:child layoutData="{strutLayoutDate}">
-            <g:HTMLPanel styleName="{style.strut}"/>
-        </container:child>
-
-        <container:child layoutData="{gridLayoutData}">
-            <container:VerticalLayoutContainer>
-                <container:child layoutData="{gridVerticalLayoutData}">
+        <container:child layoutData="{gridVerticalLayoutData}">
+            <container:HorizontalLayoutContainer>
+                <container:child layoutData="{lockedLayoutData}">
+                    <grid:Grid ui:field="lockedGrid"/>
+                </container:child>
+                <container:child layoutData="{strutLayoutDate}">
+                    <g:HTMLPanel styleName="{style.strut}"/>
+                </container:child>
+                <container:child layoutData="{gridLayoutData}">
                     <grid:Grid ui:field="grid"/>
                 </container:child>
-                <container:child layoutData="{toolBarLayoutData}">
-                    <toolbar:PagingToolBar pageSize="50" ui:field="toolBar"/>
-                </container:child>
-            </container:VerticalLayoutContainer>
+            </container:HorizontalLayoutContainer>
         </container:child>
 
-    </container:HorizontalLayoutContainer>
+        <container:child layoutData="{toolBarLayoutData}">
+            <toolbar:PagingToolBar pageSize="50" ui:field="toolBar"/>
+        </container:child>
+
+
+    </container:VerticalLayoutContainer>
 
 </ui:UiBinder>
