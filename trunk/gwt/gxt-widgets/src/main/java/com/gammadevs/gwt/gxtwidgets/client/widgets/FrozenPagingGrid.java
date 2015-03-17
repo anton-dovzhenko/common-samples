@@ -19,24 +19,23 @@ import com.sencha.gxt.data.shared.loader.PagingLoadConfig;
 import com.sencha.gxt.data.shared.loader.PagingLoadResult;
 import com.sencha.gxt.data.shared.loader.PagingLoader;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer;
+import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.BodyScrollEvent;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
-import com.sencha.gxt.widget.core.client.grid.GridSelectionModel;
 import com.sencha.gxt.widget.core.client.toolbar.PagingToolBar;
 
 import java.util.List;
 
 public class FrozenPagingGrid<T> implements IsWidget {
 
-    interface FrozenGridExampleUiBinder extends UiBinder<HorizontalLayoutContainer, FrozenPagingGrid> {}
+    interface FrozenGridExampleUiBinder extends UiBinder<VerticalLayoutContainer, FrozenPagingGrid> {}
     private static FrozenGridExampleUiBinder ourUiBinder = GWT.create(FrozenGridExampleUiBinder.class);
 
-    private final ListStore<T> store;
     private final FrozenGridSelectionModel<T> lockedGridSelectionModel;
     private final FrozenGridSelectionModel<T> gridSelectionModel;
-    private final HorizontalLayoutContainer rootElement;
+    private final VerticalLayoutContainer rootElement;
     private HandlerRegistration lockedGridHandlerRegistration;
     private HandlerRegistration gridHandlerRegistration;
 
@@ -54,7 +53,7 @@ public class FrozenPagingGrid<T> implements IsWidget {
             , List<ColumnConfig<T, ?>> lockedColumns
             , List<ColumnConfig<T, ?>> columns
             , PagingLoader<PagingLoadConfig, PagingLoadResult<T>> loader) {
-        store = new ListStore<>(key);
+        ListStore<T> store = new ListStore<>(key);
         loader.addLoadHandler(new LoadResultListStoreBinding<PagingLoadConfig, T, PagingLoadResult<T>>(store));
         lockedGridSelectionModel = new FrozenGridSelectionModel<>();
         gridSelectionModel = new FrozenGridSelectionModel<>();
@@ -76,7 +75,7 @@ public class FrozenPagingGrid<T> implements IsWidget {
         grid.setSelectionModel(gridSelectionModel);
 
         lockedLayoutData = new HorizontalLayoutContainer.HorizontalLayoutData(getLockedWidth(lockCm), 1);
-        lockedLayoutData.setMargins(new Margins(0, 0, XDOM.getScrollBarWidth() + 23, 0));
+        lockedLayoutData.setMargins(new Margins(0, 0, XDOM.getScrollBarWidth(), 0));
 
         lockedGrid.getView().setAdjustForHScroll(false);
 
