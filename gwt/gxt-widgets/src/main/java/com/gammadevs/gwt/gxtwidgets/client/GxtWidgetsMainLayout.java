@@ -1,5 +1,6 @@
 package com.gammadevs.gwt.gxtwidgets.client;
 
+import com.gammadevs.gwt.gxtwidgets.client.examples.CheckComboBoxExample;
 import com.gammadevs.gwt.gxtwidgets.client.examples.FrozenGridExample;
 import com.gammadevs.gwt.gxtwidgets.client.examples.FrozenPagingGridExample;
 import com.gammadevs.gwt.gxtwidgets.client.widgets.ExampleTreeItem;
@@ -96,6 +97,9 @@ public class GxtWidgetsMainLayout implements IsWidget {
             case FROZEN_PAGING_GRID:
                 widget = new FrozenPagingGridExample().asWidget();
                 break;
+            case CHECKED_COMBO_BOX:
+                widget = new CheckComboBoxExample().asWidget();
+                break;
             default:
                 throw new IllegalArgumentException("Type " + item.getType() + " is not supported");
         }
@@ -131,6 +135,9 @@ public class GxtWidgetsMainLayout implements IsWidget {
     }
 
     private void initExampleTreeModel() {
+        ExampleTreeItem comboRoot = new ExampleTreeItem("Charts", null);
+        store.add(comboRoot);
+        store.add(comboRoot, new ExampleTreeItem("Time Series Chart", ExampleType.TIME_SERIES_CHART));
         ExampleTreeItem gridRoot = new ExampleTreeItem("Grids", null);
         store.add(gridRoot);
         store.add(gridRoot, new ExampleTreeItem("Frozen Columns Grid", ExampleType.FROZEN_GRID));
