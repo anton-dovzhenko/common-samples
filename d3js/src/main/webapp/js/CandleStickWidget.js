@@ -36,7 +36,7 @@ function CandleStickWidget(spec) {
         var xFocusScale = d3.time.scale().range([0, spec.width]).domain([xMin, xMax]);
         var yFocusScale = d3.scale.linear().range([focusChartHeight, 0]).domain([yMin, yMax]);
 
-        var xAxis = d3.svg.axis().scale(xScale).orient('bottom').ticks(10)
+        var xAxis = d3.svg.axis().scale(xScale).orient('bottom').ticks(3)
             .tickFormat(d3.time.format(spec.xAxisFormat)).tickSize(-mainChartHeight);
         var yAxis = d3.svg.axis().scale(yScale).orient('left').ticks(5)
             .tickFormat(d3.format(spec.yAxisFormat)).tickSize(-spec.width);
