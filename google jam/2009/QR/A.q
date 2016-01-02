@@ -1,6 +1,3 @@
-\cd /Users/anton/Documents/software-projects/github/common-samples/google jam/2009/QR
- 
-
 lines: read0 `$"A-large-practice.in";
 input: "I"$" "vs lines[0];
 L: input[0];
@@ -14,5 +11,5 @@ do[N; result ,: sum dictionary like  ssr[ssr[lines[index]; "("; "["]; ")"; "]"];
 order: 1;
 output: {[matches] out: "Case #", string[order], ": ", string[matches]; order +: 1; :out;} each result;
 
-file: `:A_large1.out;
+file: `:A_large.out;
 file 0: output;

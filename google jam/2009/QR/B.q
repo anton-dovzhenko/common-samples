@@ -1,5 +1,3 @@
-\cd /Users/anton/Documents/software-projects/github/common-samples/google jam/2009/QR
-
 lines: read0 `$"B-small-practice.in";
 T:"I"$lines[0];
 alphabet: `char$ 97 + til 26;
