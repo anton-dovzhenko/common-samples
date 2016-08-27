@@ -1,12 +1,12 @@
-package vertx.exchange.core.verticles;
+package com.gamma.exchange.akka.verticles;
 
+import com.gamma.exchange.akka.ExchangeVertxApp;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vertx.exchange.core.CoreConstants;
 import vertx.exchange.core.model.Order;
 
 public class OrderFillUpdVert extends AbstractVerticle {
@@ -20,7 +20,7 @@ public class OrderFillUpdVert extends AbstractVerticle {
 
     @Override
     public void start(Future<Void> startFuture) {
-        vertx.eventBus().consumer(CoreConstants.TOPIC_INSTR_FILL + instrument, new Handler<Message<Order>>() {
+        vertx.eventBus().consumer(ExchangeVertxApp.TOPIC_INSTR_FILL + instrument, new Handler<Message<Order>>() {
             @Override
             public void handle(Message<Order> message) {
                 final Order order = message.body();

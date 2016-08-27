@@ -10,6 +10,8 @@
     <version>0.1</version>
     <modules>
         <module>core</module>
+        <module>akka</module>
+        <module>vertx</module>
     </modules>
 
     <dependencies>

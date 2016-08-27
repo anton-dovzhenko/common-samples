@@ -9,6 +9,20 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>core</artifactId>
+    <artifactId>vertx</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>vertx.exchange</groupId>
+            <artifactId>core</artifactId>
+            <version>0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-core</artifactId>
+            <version>3.3.2</version>
+        </dependency>
+    </dependencies>
+
 
 </project>

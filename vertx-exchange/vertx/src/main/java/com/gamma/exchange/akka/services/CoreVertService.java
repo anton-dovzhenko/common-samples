@@ -1,8 +1,8 @@
-package vertx.exchange.core.service;
+package com.gamma.exchange.akka.services;
 
+import com.gamma.exchange.akka.verticles.OrderFillUpdVert;
+import com.gamma.exchange.akka.verticles.OrderMatchVert;
 import io.vertx.core.Vertx;
-import vertx.exchange.core.verticles.OrderFillUpdVert;
-import vertx.exchange.core.verticles.OrderMatchVert;
 
 import java.util.List;
 
