@@ -1,0 +1,14 @@
+group 'com.gammadevs'
+version '0.1'
+
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile 'org.openjdk.jmh:jmh-core:1.17.3'
+    compile 'org.openjdk.jmh:jmh-generator-annprocess:1.17.3'
+}

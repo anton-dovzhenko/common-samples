@@ -1,0 +1,1 @@
+Money class and basic arithmetic operations (+,-,*,/) implementation, based on long type.

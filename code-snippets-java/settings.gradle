@@ -1,0 +1,8 @@
+rootProject.name = 'code-snippets'
+include 'pi-calculation'
+include 'matrix-determinant-calculation'
+include 'fast-money'
+include 'js-kdb-integration'
+findProject(':js-kdb-integration')?.name = 'js.kdb.integration'
+include 'external-sort'
+
