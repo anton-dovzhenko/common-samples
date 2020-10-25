@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>no-bloomberg</title>
+    <link rel="stylesheet" href="http://cdn.webix.com/edge/webix.css" type="text/css">
+    <script src="lib/c.js"></script>
+    <script src="http://cdn.webix.com/edge/webix.js" type="text/javascript"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="app.js"></script>
+    <script src="server.js"></script>
+    <style>
+        .bigChart {
+            height: 250px;
+            width: 400px;
+        }
+        /* Disables PlotlyJS chart control panel */
+        .modebar {
+            display: none !important;
+        }
+    </style>
+</head>
+<body class="webix_full_screen">
+
+<script type="text/javascript" charset="utf-8">
+
+    webix.ready(function() {
+        createSocketAndLoadSettings();
+    });
+</script>
+
+</body>
+</html>

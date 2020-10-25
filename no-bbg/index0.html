@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>test</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+
+        /* Disables PlotlyJS chart control panel */
+        .modebar {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+<div id="plot"></div>
+
+<script type="text/javascript" charset="utf-8">
+
+    const plotData = [{type: "scatter", x: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]
+        , y: [113, 115, 107, 108, 111, 109, 110, 117, 116, 118]}];
+    Plotly.newPlot("plot", plotData,
+        {
+            title: "Test",
+            xaxis: {tickfont: {size: 9}},
+            yaxis: {tickfont: {size: 9}},
+            margin: {l: 50, r: 20, t: 25, b: 25}
+        });
+    Plotly.relayout("plot", {'xaxis.range': [0, 5]});
+    var date = new Date();
+    console.log(date);
+    console.log(new Date(date.getTime() - 1000));
+    console.log(new Date(date.getTime() - 60*1000));
+
+</script>
+
+</body>
+</html>
