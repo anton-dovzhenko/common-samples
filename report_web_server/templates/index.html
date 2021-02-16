@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My report</title>
+</head>
+<body>
+
+Reports
+<div id="numDiv"></div>
+
+<script>
+
+    var numDiv = document.getElementById("numDiv");
+
+    function load() {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                console.log(xhr.responseText);
+                numDiv.innerText = xhr.responseText;
+            }
+        }
+        xhr.open("GET", "report/getNumber", true);
+        xhr.send(null);
+    }
+
+
+    setInterval(load, 5000);
+
+</script>
+
+</body>
+</html>
