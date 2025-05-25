@@ -32,7 +32,7 @@ public class Order {
     private boolean cancelled = false;
 
     public Order(long id, long amount, long price, long sequenceNumber) {
-        if (amount <= 0 || price <= 0 || id <= 0) {
+        if (amount < 0 || price < 0 || id < 0) {
             throw new IllegalArgumentException("Invalid order parameters");
         }
         this.id = id;

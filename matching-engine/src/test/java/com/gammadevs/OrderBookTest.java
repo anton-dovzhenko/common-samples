@@ -104,5 +104,18 @@ class OrderBookTest {
         assertEquals(0, orderBook.getAskMapCount());
     }
 
+    @Test
+    public void testLargeOrderBook() {
+        for (int i = 1; i <= 1000; i++) {
+            orderBook.addBid(new Order(i, 10, 100 + i, i));
+            orderBook.addAsk(new Order(1000 + i, 10, 100 + i, 1000 + i));
+        }
+        orderBook.addBid(new Order(2001, 100, 1100, 2001));
+        List<MatchRecord> records = blotter.getRecordsCopy();
+        assertEquals(1_000, records.size());
+        assertEquals(1, orderBook.getBidCount());
+        assertEquals(0, orderBook.getAskCount());
+    }
+
 
 }
